@@ -1,0 +1,79 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Připojení k portálu Suez Smart Solutions",
+        "description": "Vložte URL přihlašovací stránky vašeho portálu (nebo jakékoliv stránky, na které jste přihlášeni). Země, pobočka i jazyk se odvodí automaticky.",
+        "data": {
+          "url": "URL portálu",
+          "username": "Číslo zákazníka",
+          "password": "Heslo"
+        },
+        "data_description": {
+          "url": "Příklad: https://cz-sitr.suezsmartsolutions.com/eMIS.SE_VHS-Benesov/Login.aspx",
+          "username": "Číselný identifikátor uvedený na faktuře za vodné.",
+          "password": "Heslo je v Home Assistantu uložené šifrovaně a nikam dalšímu se neposílá."
+        }
+      },
+      "meters": {
+        "title": "Výběr vodoměrů",
+        "description": "Vyberte vodoměry, které chcete sledovat v Home Assistantu.",
+        "data": {
+          "meters": "Vodoměry"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Zadejte heslo znovu",
+        "description": "Přihlášení uživatele {username} na {base_url} vypršelo. Zadejte aktuální heslo k portálu.",
+        "data": {
+          "password": "Heslo"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Portál není dostupný. Zkontrolujte URL a připojení.",
+      "invalid_auth": "Portál odmítl tyto přihlašovací údaje.",
+      "invalid_url": "Zadaná URL nevypadá jako stránka portálu Suez.",
+      "select_at_least_one": "Vyberte alespoň jeden vodoměr.",
+      "unknown": "Neočekávaná chyba. Detaily naleznete v logu."
+    },
+    "abort": {
+      "already_configured": "Tento účet už je nakonfigurovaný.",
+      "reauth_successful": "Opětovné přihlášení proběhlo úspěšně."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "meter_total": {
+        "name": "Stav vodoměru"
+      },
+      "last_reading_time": {
+        "name": "Poslední odečet"
+      },
+      "today_consumption": {
+        "name": "Dnešní spotřeba"
+      },
+      "yesterday_consumption": {
+        "name": "Včerejší spotřeba"
+      },
+      "this_month_consumption": {
+        "name": "Spotřeba tento měsíc"
+      },
+      "last_month_consumption": {
+        "name": "Spotřeba minulý měsíc"
+      },
+      "this_year_consumption": {
+        "name": "Spotřeba tento rok"
+      },
+      "last_year_consumption": {
+        "name": "Spotřeba minulý rok"
+      },
+      "alarm_count": {
+        "name": "Počet alarmů"
+      },
+      "latest_alarm_time": {
+        "name": "Poslední alarm"
+      }
+    }
+  }
+}

@@ -1,0 +1,422 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="ctl00_MasterHead"><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge" /><title>
+	Energie
+</title>
+    <link type="text/css" rel="stylesheet" href="CSS/Pracdis.css?1.5.38.15508&133667298260000000" />
+    <link type="text/css" rel="stylesheet" href="CSS/WebMonthCalendar.css?1.5.38.15508&133667298260000000" />
+    <link type="text/css" rel="stylesheet" href="CSS/DataGrid.css?1.5.38.15508&133667298260000000" />
+    <link type="text/css" rel="stylesheet" href="CSS/jquery/site/jquery-ui.css?1.5.38.15508&133667298260000000" />
+    <link type="text/css" rel="stylesheet" href="CSS/jquery/ui.jqgrid.css?1.5.38.15508&133667298260000000" />
+    <link type="text/css" rel="stylesheet" href="CSS/jquery/jquery.ui.addons.css?1.5.38.15508&133667298260000000" />
+    <link type="text/css" rel="stylesheet" href="CSS/jquery/jquery.ui.selectmenu.css?1.5.38.15508&133667298260000000" />
+    <link type="text/css" rel="stylesheet" href="CSS/jquery/jquery.ui.timepicker.css?1.5.38.15508&133667298260000000" />
+    <link type="text/css" rel="stylesheet" href="CSS/jquery/jquery.jqplot.css?1.5.38.15508&133667298260000000" />
+    <link type="text/css" rel="stylesheet" href="CSS/jquery/jquery.ui.fileupload.css?1.5.38.15508&133667298260000000" />
+
+    <script type="text/javascript" src="JS/prototype.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/utils.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/ModalPopups.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.extensions.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.browser.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.globalEvents.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.localization.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript">$.localization.culture = 'cs';</script>
+    <script type="text/javascript" src="JS/jquery.serverCallback.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.ui.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.ui.utils.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.jqGrid.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.jqGrid.extension.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.ui.combobox.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.ui.selectmenu.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.ui.sliderAccess.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.ui.timepicker.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.ui.editcontrol.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.ui.extensions.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.fileDownload.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.iframe-transport.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.fileupload.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.ui.fileupload.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.export.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/excanvas.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.jqplot.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jquery.jqplot.extensions.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jqplotplugins/jqplot.barRenderer.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jqplotplugins/jqplot.cursor.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jqplotplugins/jqplot.dateAxisRenderer.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jqplotplugins/jqplot.enhancedLegendRenderer.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jqplotplugins/jqplot.highlighter.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jqplotplugins/jqplot.meterGaugeRenderer.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jqplotplugins/jqplot.export.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jqplotplugins/jqplot.ActionsRenderer.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jqplotplugins/jqplot.action.zoomOut.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/jqplotplugins/jqplot.action.selectInterval.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/odometer.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/highcharts.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/Default.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/i18n/grid.locale-cs.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/i18n/jquery.ui.datepicker-cs.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/i18n/jquery-ui-timepicker-cs.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/i18n/jqplot.DateAxisRenderer.cs.js?1.5.38.15508&133667298260000000"></script>
+    <script type="text/javascript" src="JS/i18n/highcharts.cs.js?1.5.38.15508&133667298260000000"></script>
+    <link href="CSS/1280.css" rel="stylesheet" type="text/css" />
+    <link href="CSS/1280.cs.css" rel="stylesheet" type="text/css" />
+<link href="CSS/Chrome.css" rel="stylesheet" type="text/css" />
+<link href="/eMIS.SE_VHS-Benesov/WebResource.axd?d=hGadBJeTaDR96yLpmZW_CpkYyM3cq3i6Z4BCVW1XULwtRqRNDnoq5yIEDFPf0PRNtIgOzTtpdG0BNAhX0UOhtU3EogG_oON-SazWNec5gAokIki8a2bjwJ7D2i-HDQTZpeVqj1oQJK7tvkVl9z7w-MWHEYsfLKVC5FCqJQ0jwsgtY3vc_84fSAAJWz83Ih8g0&amp;t=638578602100000000" type="text/css" rel="stylesheet" /><link type="text/css" href="Themes/EMIS.CZ.VHS/CSS/EMIS_Default.css" rel="stylesheet" /></head>
+<body>
+    <form name="aspnetForm" method="post" action="./Site_Energie.aspx?Affichage=BilanConso2017" id="aspnetForm">
+<div>
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__LASTFOCUS" id="__LASTFOCUS" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKLTM0MjE1NzY3Ng9kFgJmD2QWBAIBD2QWBAIDDxYCHgRUZXh0BfgIDQogICAgPGxpbmsgdHlwZT0idGV4dC9jc3MiIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iQ1NTL1ByYWNkaXMuY3NzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiIC8+DQogICAgPGxpbmsgdHlwZT0idGV4dC9jc3MiIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iQ1NTL1dlYk1vbnRoQ2FsZW5kYXIuY3NzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiIC8+DQogICAgPGxpbmsgdHlwZT0idGV4dC9jc3MiIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iQ1NTL0RhdGFHcmlkLmNzcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIiAvPg0KICAgIDxsaW5rIHR5cGU9InRleHQvY3NzIiByZWw9InN0eWxlc2hlZXQiIGhyZWY9IkNTUy9qcXVlcnkvc2l0ZS9qcXVlcnktdWkuY3NzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiIC8+DQogICAgPGxpbmsgdHlwZT0idGV4dC9jc3MiIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iQ1NTL2pxdWVyeS91aS5qcWdyaWQuY3NzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiIC8+DQogICAgPGxpbmsgdHlwZT0idGV4dC9jc3MiIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iQ1NTL2pxdWVyeS9qcXVlcnkudWkuYWRkb25zLmNzcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIiAvPg0KICAgIDxsaW5rIHR5cGU9InRleHQvY3NzIiByZWw9InN0eWxlc2hlZXQiIGhyZWY9IkNTUy9qcXVlcnkvanF1ZXJ5LnVpLnNlbGVjdG1lbnUuY3NzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiIC8+DQogICAgPGxpbmsgdHlwZT0idGV4dC9jc3MiIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iQ1NTL2pxdWVyeS9qcXVlcnkudWkudGltZXBpY2tlci5jc3M/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCIgLz4NCiAgICA8bGluayB0eXBlPSJ0ZXh0L2NzcyIgcmVsPSJzdHlsZXNoZWV0IiBocmVmPSJDU1MvanF1ZXJ5L2pxdWVyeS5qcXBsb3QuY3NzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiIC8+DQogICAgPGxpbmsgdHlwZT0idGV4dC9jc3MiIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iQ1NTL2pxdWVyeS9qcXVlcnkudWkuZmlsZXVwbG9hZC5jc3M/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCIgLz4NCmQCBA8WAh8ABfcnDQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvcHJvdG90eXBlLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL3V0aWxzLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL01vZGFsUG9wdXBzLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxdWVyeS5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9qcXVlcnkuZXh0ZW5zaW9ucy5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9qcXVlcnkuYnJvd3Nlci5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9qcXVlcnkuZ2xvYmFsRXZlbnRzLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxdWVyeS5sb2NhbGl6YXRpb24uanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiPiQubG9jYWxpemF0aW9uLmN1bHR1cmUgPSAnY3MnOzwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxdWVyeS5zZXJ2ZXJDYWxsYmFjay5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9qcXVlcnkudWkuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvanF1ZXJ5LnVpLnV0aWxzLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxdWVyeS5qcUdyaWQuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvanF1ZXJ5LmpxR3JpZC5leHRlbnNpb24uanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvanF1ZXJ5LnVpLmNvbWJvYm94LmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxdWVyeS51aS5zZWxlY3RtZW51LmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxdWVyeS51aS5zbGlkZXJBY2Nlc3MuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvanF1ZXJ5LnVpLnRpbWVwaWNrZXIuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvanF1ZXJ5LnVpLmVkaXRjb250cm9sLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxdWVyeS51aS5leHRlbnNpb25zLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxdWVyeS5maWxlRG93bmxvYWQuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvanF1ZXJ5LmlmcmFtZS10cmFuc3BvcnQuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvanF1ZXJ5LmZpbGV1cGxvYWQuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvanF1ZXJ5LnVpLmZpbGV1cGxvYWQuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvanF1ZXJ5LmV4cG9ydC5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9leGNhbnZhcy5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9qcXVlcnkuanFwbG90LmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxdWVyeS5qcXBsb3QuZXh0ZW5zaW9ucy5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9qcXBsb3RwbHVnaW5zL2pxcGxvdC5iYXJSZW5kZXJlci5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9qcXBsb3RwbHVnaW5zL2pxcGxvdC5jdXJzb3IuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvanFwbG90cGx1Z2lucy9qcXBsb3QuZGF0ZUF4aXNSZW5kZXJlci5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9qcXBsb3RwbHVnaW5zL2pxcGxvdC5lbmhhbmNlZExlZ2VuZFJlbmRlcmVyLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxcGxvdHBsdWdpbnMvanFwbG90LmhpZ2hsaWdodGVyLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxcGxvdHBsdWdpbnMvanFwbG90Lm1ldGVyR2F1Z2VSZW5kZXJlci5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9qcXBsb3RwbHVnaW5zL2pxcGxvdC5leHBvcnQuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvanFwbG90cGx1Z2lucy9qcXBsb3QuQWN0aW9uc1JlbmRlcmVyLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxcGxvdHBsdWdpbnMvanFwbG90LmFjdGlvbi56b29tT3V0LmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2pxcGxvdHBsdWdpbnMvanFwbG90LmFjdGlvbi5zZWxlY3RJbnRlcnZhbC5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9vZG9tZXRlci5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9oaWdoY2hhcnRzLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL0RlZmF1bHQuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvaTE4bi9ncmlkLmxvY2FsZS1jcy5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9pMThuL2pxdWVyeS51aS5kYXRlcGlja2VyLWNzLmpzPzEuNS4zOC4xNTUwOCYxMzM2NjcyOTgyNjAwMDAwMDAiPjwvc2NyaXB0Pg0KICAgIDxzY3JpcHQgdHlwZT0idGV4dC9qYXZhc2NyaXB0IiBzcmM9IkpTL2kxOG4vanF1ZXJ5LXVpLXRpbWVwaWNrZXItY3MuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQogICAgPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iSlMvaTE4bi9qcXBsb3QuRGF0ZUF4aXNSZW5kZXJlci5jcy5qcz8xLjUuMzguMTU1MDgmMTMzNjY3Mjk4MjYwMDAwMDAwIj48L3NjcmlwdD4NCiAgICA8c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJKUy9pMThuL2hpZ2hjaGFydHMuY3MuanM/MS41LjM4LjE1NTA4JjEzMzY2NzI5ODI2MDAwMDAwMCI+PC9zY3JpcHQ+DQpkAgMPZBYMAgMPZBYEAgEPFgIeBGhyZWYFFWh0dHA6Ly93d3cudmhzLXNyby5jehYCZg8WAh4Dc3JjBRNJbWFnZXMvTG9nb1N1cHAucG5nZAIDDxYCHglpbm5lcmh0bWwFNFZvZG9ob3Nwb2QmIzIyNTvFmXNrJiMyMjU7IHNwb2xlxI1ub3N0IEJlbmXFoW92IGEucy5kAgUPZBYCAgEPDxYCHwAFEUTDoWxrb3bDqSBvZGXEjXR5ZGQCBw8PFgIeB1Zpc2libGVoZBYCZg8PFgQeCENzc0NsYXNzBRlQYW5lbE1lbnVUaXRyZV9EZXRhaWxTaXRlHgRfIVNCAgJkFgICAQ8PFgQfBQUZUGFuZWxNZW51VGl0cmVfRGV0YWlsU2l0ZR8GAgJkZAILDxYCHwRoZAINDxYCHgVjbGFzcwUHRElWUGFnZRYIAgEPZBYCAgEPZBYCZg9kFgQCAQ8PFgIfAAUQNjAxMjAtQk4tMDA5MDk0MGRkAgMPDxYCHwAFDlNwb3TFmWViYSBWb2RhZGQCAw8WAh8EaGQCBw8WAh8EaGQCCw9kFgICAQ9kFgJmD2QWBAIBD2QWAmYPZBYCAgEPZBYCZg9kFgYCAQ9kFgICAQ8PFgIfAAUPVm9sYmEgbcSbc8OtY2U6ZGQCAw9kFgJmD2QWCgIBD2QWEGYPDxYEHwUFFkJpbGFuQ29uc29tbWF0aW9uX0pvdXIfBgICZGQCAQ8PFgQfBQUWQmlsYW5Db25zb21tYXRpb25fSm91ch8GAgJkZAICDw8WBB8FBRZCaWxhbkNvbnNvbW1hdGlvbl9Kb3VyHwYCAmRkAgMPDxYEHwUFGUJpbGFuQ29uc29tbWF0aW9uX0pvdXJNaW4fBgICZGQCBA8PFgQfBQUZQmlsYW5Db25zb21tYXRpb25fSm91ck1heB8GAgJkZAIFDw8WBB8FBRZCaWxhbkNvbnNvbW1hdGlvbl9Kb3VyHwYCAmRkAgYPDxYEHwUFFkJpbGFuQ29uc29tbWF0aW9uX0pvdXIfBgICZGQCBw8PFgIeB1Jvd1NwYW4CAWRkAgIPZBYQZg8PFgQfBQUWQmlsYW5Db25zb21tYXRpb25fSm91ch8GAgJkZAIBDw8WBB8FBRZCaWxhbkNvbnNvbW1hdGlvbl9Kb3VyHwYCAmRkAgIPDxYEHwUFFkJpbGFuQ29uc29tbWF0aW9uX0pvdXIfBgICZGQCAw8PFgQfBQUZQmlsYW5Db25zb21tYXRpb25fSm91ck1pbh8GAgJkZAIEDw8WBB8FBRlCaWxhbkNvbnNvbW1hdGlvbl9Kb3VyTWF4HwYCAmRkAgUPDxYEHwUFFkJpbGFuQ29uc29tbWF0aW9uX0pvdXIfBgICZGQCBg8PFgQfBQUWQmlsYW5Db25zb21tYXRpb25fSm91ch8GAgJkZAIHDw8WAh8IAgFkZAIDD2QWEGYPDxYEHwUFFkJpbGFuQ29uc29tbWF0aW9uX0pvdXIfBgICZGQCAQ8PFgQfBQUWQmlsYW5Db25zb21tYXRpb25fSm91ch8GAgJkZAICDw8WBB8FBRlCaWxhbkNvbnNvbW1hdGlvbl9Kb3VyTWluHwYCAmRkAgMPDxYEHwUFFkJpbGFuQ29uc29tbWF0aW9uX0pvdXIfBgICZGQCBA8PFgQfBQUZQmlsYW5Db25zb21tYXRpb25fSm91ck1heB8GAgJkZAIFDw8WBB8FBRZCaWxhbkNvbnNvbW1hdGlvbl9Kb3VyHwYCAmRkAgYPDxYEHwUFFkJpbGFuQ29uc29tbWF0aW9uX0pvdXIfBgICZGQCBw8PFgIfCAIBZGQCBA9kFhBmDw8WBB8FBRZCaWxhbkNvbnNvbW1hdGlvbl9Kb3VyHwYCAmRkAgEPDxYEHwUFFkJpbGFuQ29uc29tbWF0aW9uX0pvdXIfBgICZGQCAg8PFgQfBQUWQmlsYW5Db25zb21tYXRpb25fSm91ch8GAgJkZAIDDw8WBB8FBRlCaWxhbkNvbnNvbW1hdGlvbl9Kb3VyTWluHwYCAmRkAgQPDxYEHwUFGUJpbGFuQ29uc29tbWF0aW9uX0pvdXJNYXgfBgICZGQCBQ8PFgQfBQUWQmlsYW5Db25zb21tYXRpb25fSm91ch8GAgJkZAIGDw8WBB8FBRZCaWxhbkNvbnNvbW1hdGlvbl9Kb3VyHwYCAmRkAgcPDxYCHwgCAWRkAgUPZBYQZg8PFgQfBQUWQmlsYW5Db25zb21tYXRpb25fSm91ch8GAgJkZAIBDw8WBB8FBRZCaWxhbkNvbnNvbW1hdGlvbl9Kb3VyHwYCAmRkAgIPDxYEHwUFFkJpbGFuQ29uc29tbWF0aW9uX0pvdXIfBgICZGQCAw8PFgQfBQUWQmlsYW5Db25zb21tYXRpb25fSm91ch8GAgJkZAIEDw8WBB8FBRZCaWxhbkNvbnNvbW1hdGlvbl9Kb3VyHwYCAmRkAgUPDxYEHwUFFkJpbGFuQ29uc29tbWF0aW9uX0pvdXIfBgICZGQCBg8PFgQfBQUWQmlsYW5Db25zb21tYXRpb25fSm91ch8GAgJkZAIHDw8WAh8IAgFkZAIJDw8WAh8ABQdacnXFoWl0ZGQCAw8PFgIfBGhkFgJmD2QWAgIDD2QWAgIBDzwrABECARAWABYAFgAMFCsAAGQCEQ8PFgIfAAUdUHJhY2Rpcy5HRSBCdWlsZCAxLjUuMzguMTU1MDhkZBgBBURjdGwwMCRQSFpvbmVQcmluY2lwYWxlJENvbXBvc2l0aW9uQWdyZWdhdCRHcmlkVmlld0NvbXBvc2l0aW9uQWdyZWdhdA9nZC7np06yT/72TMh9acZ2NBf7m23KB+bopJryWplBHDKr" />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['aspnetForm'];
+if (!theForm) {
+    theForm = document.aspnetForm;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="/eMIS.SE_VHS-Benesov/WebResource.axd?d=rmjuk-nSZd1qqjKdT1I4QEJK9LNWrQNj_M2YZ_jKF74VRYdgC_ChHSvllWGEqs2GdROQHvmltVKR8ASy0hB2eDboHiVHDsV5UCkBpVlPcl81&amp;t=638942282819057530" type="text/javascript"></script>
+
+
+<script src="Themes/EMIS.CZ.VHS/JS/EMIS_Default.js" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+var __cultureInfo = {"name":"cs","numberFormat":{"CurrencyDecimalDigits":2,"CurrencyDecimalSeparator":",","IsReadOnly":false,"CurrencyGroupSizes":[3],"NumberGroupSizes":[3],"PercentGroupSizes":[3],"CurrencyGroupSeparator":" ","CurrencySymbol":"Kč","NaNSymbol":"NaN","CurrencyNegativePattern":8,"NumberNegativePattern":1,"PercentPositivePattern":0,"PercentNegativePattern":0,"NegativeInfinitySymbol":"-∞","NegativeSign":"-","NumberDecimalDigits":2,"NumberDecimalSeparator":",","NumberGroupSeparator":" ","CurrencyPositivePattern":3,"PositiveInfinitySymbol":"∞","PositiveSign":"+","PercentDecimalDigits":2,"PercentDecimalSeparator":",","PercentGroupSeparator":" ","PercentSymbol":"%","PerMilleSymbol":"‰","NativeDigits":["0","1","2","3","4","5","6","7","8","9"],"DigitSubstitution":1},"dateTimeFormat":{"AMDesignator":"dop.","Calendar":{"MinSupportedDateTime":"\/Date(-62135596800000)\/","MaxSupportedDateTime":"\/Date(253402297199999)\/","AlgorithmType":1,"CalendarType":1,"Eras":[1],"TwoDigitYearMax":2029,"IsReadOnly":false},"DateSeparator":".","FirstDayOfWeek":1,"CalendarWeekRule":2,"FullDateTimePattern":"dddd d. MMMM yyyy H:mm:ss","LongDatePattern":"dddd d. MMMM yyyy","LongTimePattern":"H:mm:ss","MonthDayPattern":"d. MMMM","PMDesignator":"odp.","RFC1123Pattern":"ddd, dd MMM yyyy HH\u0027:\u0027mm\u0027:\u0027ss \u0027GMT\u0027","ShortDatePattern":"dd.MM.yyyy","ShortTimePattern":"H:mm","SortableDateTimePattern":"yyyy\u0027-\u0027MM\u0027-\u0027dd\u0027T\u0027HH\u0027:\u0027mm\u0027:\u0027ss","TimeSeparator":":","UniversalSortableDateTimePattern":"yyyy\u0027-\u0027MM\u0027-\u0027dd HH\u0027:\u0027mm\u0027:\u0027ss\u0027Z\u0027","YearMonthPattern":"MMMM yyyy","AbbreviatedDayNames":["ne","po","út","st","čt","pá","so"],"ShortestDayNames":["ne","po","út","st","čt","pá","so"],"DayNames":["neděle","pondělí","úterý","středa","čtvrtek","pátek","sobota"],"AbbreviatedMonthNames":["led","úno","bře","dub","kvě","čvn","čvc","srp","zář","říj","lis","pro",""],"MonthNames":["leden","únor","březen","duben","květen","červen","červenec","srpen","září","říjen","listopad","prosinec",""],"IsReadOnly":false,"NativeCalendarName":"Gregoriánský kalendář","AbbreviatedMonthGenitiveNames":["led","úno","bře","dub","kvě","čvn","čvc","srp","zář","říj","lis","pro",""],"MonthGenitiveNames":["ledna","února","března","dubna","května","června","července","srpna","září","října","listopadu","prosince",""]},"eras":[1,"n. l.",null,0]};//]]>
+</script>
+
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=9WTJdPYwBWsuKkjeWxApmpoibrs_e4Ko-HsIYH_jpepQrLpKI70JCyLPPtnaRjbhhEXiGrX0sEd8KsYJap5G5L2yCxfI3aS8cuLYhdkzyTfZ2yn-J_TctolyC7hF1WndOK--OyeHCR5058MCJCyjAzzG-Aizp3ZIxZfVoML5rNcAxHZKRqIXgD1t68KDxeiC0&amp;t=32e5dfca" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+if (typeof(Sys) === 'undefined') throw new Error('ASP.NET Ajax client-side framework failed to load.');
+//]]>
+</script>
+
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=G0oVbL2sQiWKykXhEFpHI4LZf1IrvIlfSSlMczGRumSoHEvtpGHnWHudKcjlMEyxkCxLe0Bf_TweFK3hUhWq-sxttHMqkusZnnvw_PuZ_fij89-F7jMyZGcNKlsrUU3rMY-C4ujL1fg_u2ipwCAPUNQowLv8JkvmOUUNwQvxIS7K8Imqy-6VZQI3IAfqOlml0&amp;t=32e5dfca" type="text/javascript"></script>
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=Cyrgs-A-qvS1x7CGXNv8XUg3VVdq9JdTlGANf7BsA7GODrbGTCu2yqbd1RzYtnfwDjJGTpEk8FPA8Kr6Pef1N921eTyC93vTSSPSTBtixcS5KqAhOLlvuScyChofKuJUQsfXbnXtdgnfjB0ilSvmEQFD8vPrpAMBgABgrLfBOk01&amp;t=ffffffffa677682c" type="text/javascript"></script>
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=DkoDbJRBAao7GQyI1kLjKS1Y3lb8n63BHF9bJFpgmiM_5n0cV8uTub7vCzFP6xZGJtoWCjutDY8MU0lXqSikZxUerO2e8xvoUcfRdpCu4nRJ9KEal7CET9HA4okVYgeegMqh7IqdJDB4ohp6hBS-GAhJhhgcu6v_HYnHhlQPOMU1&amp;t=ffffffffa677682c" type="text/javascript"></script>
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=EYtZpPJ3t_u9DqxXmxjbfanOjLHoTbFH2jOKq4LkGT6KkPItts5c9pSw02OLsEsTlL-WAntT2XkjiAtSPdlC2dYrT2xVw_vyCLikkKKElpvg4Sa-o7vhG8-jtFLbTkkkQWNyMQShUOF8UxFxeI6ceZj64DwDWtQhjtsHsJmhlUVw7_zkJDZwK7q7BpAib4ys0&amp;t=ffffffffa677682c" type="text/javascript"></script>
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=0GwTIcNRt9jX-tN0kSPR0i59mOG_1wXDCeuFKywSz0hVQfhfszk1tpxmiZ_HaOj3BaoSMni9QLpP84YabLLQcNNrkLBXSQi9qx3fWZvyru8g3LAAMMNb2Y2lvC5wI8XUNJwb_9bEGSH2c1oyjqVVVjGVGpfK4DBi_iOSfsu53AA1&amp;t=ffffffffa677682c" type="text/javascript"></script>
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=7RiTC1uyQHpCpmUlEyWDGIyjCdmGjwafBKmJLmHp8qiILmHkhJ-1RbNjzkGGEtdfhCMgIVp92fpFp72K1ZpLjTi1Sh2x2UMwd68iW3ectV_eqGDH9xJnoFp2Z0836BJHuvuvdj1GuPaGIrsyg1MkbSewBh19j8coC4SOW2O0-Go1&amp;t=ffffffffa677682c" type="text/javascript"></script>
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=_rx0FzYq221fVNj0e-wS2uaXSwadFSRf_5tqxi6_OwoF-K6FEk1w9sv1Z9zysDq3QdFIFXuFxpcp6mtcFTZQbEaWrcmYNCH5QiXJYslizD3DVXcvmLvPmh9ggAWNcF8RvswmpDS-lM-KKO10uHYW2Jqn-XrS4_CHZFELtam5Jy81&amp;t=ffffffffa677682c" type="text/javascript"></script>
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=UjQKOq3wO-HSIlKl_uKThu5S6ZP-RSM22MIvt2OExN6tcBtlZBkRHZtRlWBV_i1TTPCsKUzCt6Q10LkOtqDRoa8FhpJWNfmEpsr9P67lKINqiHPMBgBimpcGZdWzqfku6-uzoKhhFNT4rYbzzHcF6joIwATpwapPT5Kr8V8iYn81&amp;t=ffffffffa677682c" type="text/javascript"></script>
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=J5evHmgsEpq9voHC-dKOBXC6fPPmOTXud7v5FTgADBP_s6cCf_odGweXRTRh6h6npnv0zce2VkrEwFZy9vG3N86ltVK3_DaTpuWs8wJjoNw3f32mt282E46WDsjkeeb_RhkfP3E6U5Nz3zpKQ_5YMTEsC5-YpXZ6HvdXrdIILBA1&amp;t=ffffffffa677682c" type="text/javascript"></script>
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=CE-jij2wsHrOtTo3OXbBUvEpxW89uJNSMw9gXaZlQytU-txl76dieZTXCzvOMzPLPFlQZo8BitlrnIyXAVQnRn7QutqlprLdvX7O4XBCQdqZDZAOJcojpJrs0oire88ZFm7BHCsLEUTyYGyuMVfB4pQrUzxQ5Bgrw5OIfVm8M2g1&amp;t=ffffffffa677682c" type="text/javascript"></script>
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=4cZQKWvo03Sfc4uR5Xsfu76BH7MRbrcYjZpX9UxGnZH7A2nzxLnj13i5VsIo8_-ZozrGi3Tsdxx24_BAmIuwrlV9BI6rAVCkmM4gkvgIYVQFlfuoDcADoFXNDq3KJt08oa7VXy5yw9EutNYh_h_IRMOODhT4DBh80sWotgGrPUUuy8IJt0wothnT4pbGfQYJ0&amp;t=ffffffffe7750350" type="text/javascript"></script>
+<div>
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="3F1077C3" />
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdAAg2cxhgBWWqdAUEM+2nHb1B0x1Ry9Dp+urNRXkyyfakbyVWpwhMy3jI9ZwJ4+u7xm7YQZbjVBUDgkv6xKgayg/pfj4RQpDRBi0kF55QWYXTDDeF/jsIopIO0GICHo4rv+ImeurFaPyaRpK8p5o+ZbgF9xmjlovuIKqNVazu/v9AGBnhRyRJjwQrEeEDeECUHQ5X0YBfsYsYuvkMy1kgUv2j" />
+</div>
+    <script type="text/javascript">
+//<![CDATA[
+Sys.WebForms.PageRequestManager._initialize('ctl00$ScriptManager', 'aspnetForm', ['tctl00$MenuV1$UpdatePanelMenu','','tctl00$PHTitre$UpdatePanelTitre','','tctl00$PHZonePrincipale$UpdatePanelComposant','','tctl00$PHZonePrincipale$ctl01$UpdatePanelSVG',''], [], ['ctl00$PHZonePrincipale$ctl01$TextBoxMois',''], 90, 'ctl00');
+//]]>
+</script>
+
+    <div id="PanelPage">
+        <div id="ctl00_divLogoVHS" class="DivLogoSupp">
+            <a href="http://www.vhs-sro.cz" id="ctl00_LienImage"><img src="Images/LogoSupp.png" id="ctl00_imgLogoSupp" /></a>&nbsp;<label id="ctl00_lblTitreLogoSupp" class="LogoSupp" title="Implémenter texte">Vodohospod&#225;řsk&#225; společnost Benešov a.s.</label>
+            <br /><br />
+        </div>
+        <div id="ctl00_PanelHeader" class="HeaderPanel">
+	
+            <span id="ctl00_LabelTitre" class="FormulaireTitreHeaderDefault">Dálkové odečty</span>
+        
+</div>
+        <div>
+            
+            <a class="print" href="#">
+                <img src="Images/Print.png" alt="Imprimer" /></a>
+            <script type="text/javascript">
+                //<![CDATA[
+                $(document).ready(function () {
+                    $(".print").click(function () {
+                        $(this).hide();
+                        window.print();
+                        $(this).show();
+                        return false;
+                    });
+                });
+                //]]>
+            </script>
+        </div>
+        <div id="PanelPageMenu">
+            <div id="ctl00_DIVMenuMarge" class="DIVMenuMarge">
+                <div id="ctl00_MenuV1_UpdatePanelMenu">
+	
+        <div id="ctl00_MenuV1_MenuGauche"><br/><script type="text/javascript">  function AfficherMenu(id)  {    if (GetElement(id).style.visibility == 'hidden')    {      GetElement(id).style.visibility = 'visible';      GetElement(id).style.position = 'relative';    }    else    {      GetElement(id).style.visibility = 'hidden';      GetElement(id).style.position = 'absolute';    }  }</script><div id="menu"><div class="menutitre_DetailSite"><img src="images/fleche1.gif" alt="" /><span>Hlavní nabídka</span></div><div id="MenuHlavní nabídka" class="menu"><ul><li class="menuitem"><a href="Site.aspx" class="menuitemlink"> Domů</a></li><li class="menuitem"><a href="ModifierMotDePasse.aspx" class="menuitemlink"> Změna hesla</a></li><li class="menuitem"><a href="Login.aspx" class="menuitemlink"> Odhlásit</a></li></ul></div><br/><div class="menutitre_DetailSite"><img src="images/fleche1.gif" alt="" /><span>Spotřeba</span></div><div id="MenuSpotřeba" class="menu"><ul><li class="menuitem"><a href="Site_Energie.aspx?Affichage=ConsoJour" class="menuitemlink"> Denní spotřeba</a></li><li class="menuitem"><a href="Site_Energie.aspx?Affichage=ConsoMois" class="menuitemlink"> Měsíční spotřeba</a></li><li class="menuitem"><a href="Site_Energie.aspx?Affichage=ConsoSaison" class="menuitemlink"> Spotřeba dle ročních období</a></li><li class="menuitem"><a href="Site_Energie.aspx?Affichage=ConsoAn" class="menuitemlink"> Spotřeba za rok</a></li><li class="menuitem"><a href="Site_Energie.aspx?Affichage=BilanConso2017" class="menuitemactif"> Rozložení spotřeby</a></li><li class="menuitem"><a href="Site_Energie.aspx?Affichage=ComparatifUsage" class="menuitemlink"> Spotřeba v intervalech</a></li></ul></div><br/><div class="menutitre_DetailSite"><img src="images/fleche1.gif" alt="" /><span>Údaje měřidla</span></div><div id="MenuÚdaje měřidla" class="menu"><ul><li class="menuitem"><a href="Site_Energie.aspx?Affichage=IndexJour&amp;IndexesSepares=true&amp;PeriodeComplete=false" class="menuitemlink"> Historie stavů měřidla</a></li><li class="menuitem"><a href="Site_Energie.aspx?Affichage=IndexMois&amp;IndexesSepares=true&amp;PeriodeComplete=false" class="menuitemlink"> Měsíční stavy měřidla</a></li><li class="menuitem"><a href="Site_Energie.aspx?Affichage=CourbeMois" class="menuitemlink"> Křivka spotřeby</a></li></ul></div><br/><div class="menutitre_DetailSite"><img src="images/fleche1.gif" alt="" /><span>Alarmy</span></div><div id="MenuAlarmy" class="menu"><ul><li class="menuitem"><a href="Site_AlarmesClient.aspx" class="menuitemlink"> Alarmy</a></li><li class="menuitem"><a href="Site_ConfigurationAlarmeClient.aspx" class="menuitemlink"> Konfiguruj alarm</a></li></ul></div><br/></div></div>
+    
+</div>
+
+            </div>
+            
+            <div id="ctl00_DIVPage" class="DIVPage">
+                <div id="master_content">
+                    <div id="master_contentheader">
+                        
+    <div id="ctl00_PHTitre_UpdatePanelTitre">
+	
+            <table width="100%" class="TitrePage">
+                <tr>
+                    <td>
+                        <span class="TitreCouleur">
+                            <img src="images/puce1.png" alt="" />&nbsp;
+                            <span id="ctl00_PHTitre_LabelTitreSite">99999-XX-1234567</span>
+                        </span>&nbsp;&nbsp; <span class="TitreSimple">
+                            <img src="images/puce2.png" alt="" />&nbsp;
+                            <span id="ctl00_PHTitre_LabelTitrePage">Spotřeba Voda</span>
+                        </span>
+                    </td>
+                </tr>
+            </table>
+        
+</div>
+
+                    </div>
+                    <div id="master_contentnoheader">
+                        <br />
+                        
+                        
+                        
+                        
+                        <div id="master_contentplaceholder">
+                            
+    <div id="ctl00_PHZonePrincipale_UpdatePanelComposant">
+	
+            
+<script type="text/javascript" src="../../JS/AddOn/jquery.zoomooz.min.js"></script>
+<link rel="stylesheet" href="../../JS/AddOn/style.css" type="text/css" media="screen" />
+
+<div id="ctl00_PHZonePrincipale_ctl01_UpdatePanelSVG">
+		
+        <div id="ctl00_PHZonePrincipale_ctl01_PanelPeriode">
+			
+            <span id="ctl00_PHZonePrincipale_ctl01_LabelChoixMois" class="LibelleTitre">Volba měsíce:</span>
+            <input name="ctl00$PHZonePrincipale$ctl01$TextBoxMois" type="text" value="květen 2026" onchange="javascript:setTimeout(&#39;__doPostBack(\&#39;ctl00$PHZonePrincipale$ctl01$TextBoxMois\&#39;,\&#39;\&#39;)&#39;, 0)" onkeypress="if (WebForm_TextBoxKeyHandler(event) == false) return false;" id="ctl00_PHZonePrincipale_ctl01_TextBoxMois" style="width:100px;" />
+            
+        
+		</div>
+        <br />
+        <table border="0">
+			<tr>
+				<th>pondělí</th><th>úterý</th><th>středa</th><th>čtvrtek</th><th>pátek</th><th>sobota</th><th>neděle</th><th></th>
+			</tr><tr>
+				<td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0427')" ><b>27.04.2026</b><div id="graph0427" onclick="javascript:VisibleGraph('0427')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-1.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0427" class ="DivZoomCache">27.04.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0428')" ><b>28.04.2026</b><div id="graph0428" onclick="javascript:VisibleGraph('0428')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-2.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0428" class ="DivZoomCache">28.04.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0429')" ><b>29.04.2026</b><div id="graph0429" onclick="javascript:VisibleGraph('0429')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-3.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0429" class ="DivZoomCache">29.04.2026</div></div></td><td class="BilanConsommation_JourMin"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0430')" ><b>30.04.2026</b><div id="graph0430" onclick="javascript:VisibleGraph('0430')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-4.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0430" class ="DivZoomCache">30.04.2026</div></div></td><td class="BilanConsommation_JourMax"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0501')" ><b>01.05.2026</b><div id="graph0501" onclick="javascript:VisibleGraph('0501')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-5.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0501" class ="DivZoomCache">01.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0502')" ><b>02.05.2026</b><div id="graph0502" onclick="javascript:VisibleGraph('0502')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-6.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0502" class ="DivZoomCache">02.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0503')" ><b>03.05.2026</b><div id="graph0503" onclick="javascript:VisibleGraph('0503')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-7.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0503" class ="DivZoomCache">03.05.2026</div></div></td><td rowspan="1"><div class="BilanConsommationHebdo">
+					<table border="0">
+						<tr>
+							<td align="right">Celková spotřeba :</td><td align="right">2678 l</td>
+						</tr><tr>
+							<td align="right">Maximální spotřeba :</td><td align="right">479 l</td>
+						</tr>
+					</table>
+				</div></td>
+			</tr><tr>
+				<td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0504')" ><b>04.05.2026</b><div id="graph0504" onclick="javascript:VisibleGraph('0504')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-8.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0504" class ="DivZoomCache">04.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0505')" ><b>05.05.2026</b><div id="graph0505" onclick="javascript:VisibleGraph('0505')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-9.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0505" class ="DivZoomCache">05.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0506')" ><b>06.05.2026</b><div id="graph0506" onclick="javascript:VisibleGraph('0506')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-10.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0506" class ="DivZoomCache">06.05.2026</div></div></td><td class="BilanConsommation_JourMin"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0507')" ><b>07.05.2026</b><div id="graph0507" onclick="javascript:VisibleGraph('0507')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-11.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0507" class ="DivZoomCache">07.05.2026</div></div></td><td class="BilanConsommation_JourMax"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0508')" ><b>08.05.2026</b><div id="graph0508" onclick="javascript:VisibleGraph('0508')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-12.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0508" class ="DivZoomCache">08.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0509')" ><b>09.05.2026</b><div id="graph0509" onclick="javascript:VisibleGraph('0509')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-13.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0509" class ="DivZoomCache">09.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0510')" ><b>10.05.2026</b><div id="graph0510" onclick="javascript:VisibleGraph('0510')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-14.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0510" class ="DivZoomCache">10.05.2026</div></div></td><td rowspan="1"><div class="BilanConsommationHebdo">
+					<table border="0">
+						<tr>
+							<td align="right">Celková spotřeba :</td><td align="right">2573 l</td>
+						</tr><tr>
+							<td align="right">Maximální spotřeba :</td><td align="right">455 l</td>
+						</tr>
+					</table>
+				</div></td>
+			</tr><tr>
+				<td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0511')" ><b>11.05.2026</b><div id="graph0511" onclick="javascript:VisibleGraph('0511')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-15.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0511" class ="DivZoomCache">11.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0512')" ><b>12.05.2026</b><div id="graph0512" onclick="javascript:VisibleGraph('0512')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-16.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0512" class ="DivZoomCache">12.05.2026</div></div></td><td class="BilanConsommation_JourMin"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0513')" ><b>13.05.2026</b><div id="graph0513" onclick="javascript:VisibleGraph('0513')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-17.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0513" class ="DivZoomCache">13.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0514')" ><b>14.05.2026</b><div id="graph0514" onclick="javascript:VisibleGraph('0514')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-18.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0514" class ="DivZoomCache">14.05.2026</div></div></td><td class="BilanConsommation_JourMax"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0515')" ><b>15.05.2026</b><div id="graph0515" onclick="javascript:VisibleGraph('0515')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-19.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0515" class ="DivZoomCache">15.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0516')" ><b>16.05.2026</b><div id="graph0516" onclick="javascript:VisibleGraph('0516')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-20.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0516" class ="DivZoomCache">16.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0517')" ><b>17.05.2026</b><div id="graph0517" onclick="javascript:VisibleGraph('0517')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-21.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0517" class ="DivZoomCache">17.05.2026</div></div></td><td rowspan="1"><div class="BilanConsommationHebdo">
+					<table border="0">
+						<tr>
+							<td align="right">Celková spotřeba :</td><td align="right">7237 l</td>
+						</tr><tr>
+							<td align="right">Maximální spotřeba :</td><td align="right">5178 l</td>
+						</tr>
+					</table>
+				</div></td>
+			</tr><tr>
+				<td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0518')" ><b>18.05.2026</b><div id="graph0518" onclick="javascript:VisibleGraph('0518')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-22.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0518" class ="DivZoomCache">18.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0519')" ><b>19.05.2026</b><div id="graph0519" onclick="javascript:VisibleGraph('0519')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-23.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0519" class ="DivZoomCache">19.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0520')" ><b>20.05.2026</b><div id="graph0520" onclick="javascript:VisibleGraph('0520')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-24.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0520" class ="DivZoomCache">20.05.2026</div></div></td><td class="BilanConsommation_JourMin"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0521')" ><b>21.05.2026</b><div id="graph0521" onclick="javascript:VisibleGraph('0521')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-25.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0521" class ="DivZoomCache">21.05.2026</div></div></td><td class="BilanConsommation_JourMax"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0522')" ><b>22.05.2026</b><div id="graph0522" onclick="javascript:VisibleGraph('0522')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-26.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0522" class ="DivZoomCache">22.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0523')" ><b>23.05.2026</b><div id="graph0523" onclick="javascript:VisibleGraph('0523')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-27.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0523" class ="DivZoomCache">23.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0524')" ><b>24.05.2026</b><div id="graph0524" onclick="javascript:VisibleGraph('0524')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-28.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0524" class ="DivZoomCache">24.05.2026</div></div></td><td rowspan="1"><div class="BilanConsommationHebdo">
+					<table border="0">
+						<tr>
+							<td align="right">Celková spotřeba :</td><td align="right">13656 l</td>
+						</tr><tr>
+							<td align="right">Maximální spotřeba :</td><td align="right">7435 l</td>
+						</tr>
+					</table>
+				</div></td>
+			</tr><tr>
+				<td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0525')" ><b>25.05.2026</b><div id="graph0525" onclick="javascript:VisibleGraph('0525')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-29.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0525" class ="DivZoomCache">25.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0526')" ><b>26.05.2026</b><div id="graph0526" onclick="javascript:VisibleGraph('0526')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-30.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0526" class ="DivZoomCache">26.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0527')" ><b>27.05.2026</b><div id="graph0527" onclick="javascript:VisibleGraph('0527')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-31.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0527" class ="DivZoomCache">27.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0528')" ><b>28.05.2026</b><div id="graph0528" onclick="javascript:VisibleGraph('0528')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-32.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0528" class ="DivZoomCache">28.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0529')" ><b>29.05.2026</b><div id="graph0529" onclick="javascript:VisibleGraph('0529')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-33.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0529" class ="DivZoomCache">29.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0530')" ><b>30.05.2026</b><div id="graph0530" onclick="javascript:VisibleGraph('0530')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-34.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0530" class ="DivZoomCache">30.05.2026</div></div></td><td class="BilanConsommation_Jour"><div style='text-align:right;cursor:pointer' onclick="javascript:VisibleGraph('0531')" ><b>31.05.2026</b><div id="graph0531" onclick="javascript:VisibleGraph('0531')"><embed id="Histo" src="GetSVG.aspx?ID=c7f2e3bc-0acb-432d-a0d5-531d3ca15295-35.svg"  width="80" height="60" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" /></div><div id="dte0531" class ="DivZoomCache">31.05.2026</div></div></td><td rowspan="1"><div class="BilanConsommationHebdo">
+					<table border="0">
+						<tr>
+							<td align="right">Celková spotřeba :</td><td align="right">0 l</td>
+						</tr><tr>
+							<td align="right">Maximální spotřeba :</td><td align="right">0 l</td>
+						</tr>
+					</table>
+				</div></td>
+			</tr>
+		</table>
+        
+        <div id="detail" onclick="javascript:Visible()" class="DivZoomCache">
+        </div>
+        <div id="divFermer" class="divFermerZoomCache">
+            <div id="ctl00_PHZonePrincipale_ctl01_btDivFermer" class="btDivFermer" onclick="javascript:Visible();"></div>
+                <b><label id="dteZoom" class="LibelleTitre" style="top:-20px;position:relative;"></label></b>
+                <br />
+                <input type="submit" name="ctl00$PHZonePrincipale$ctl01$btFermer" value="Zrušit" id="ctl00_PHZonePrincipale_ctl01_btFermer" class="Bouton" style="width:70px;" />
+            </div>
+        </div>
+    
+	</div>
+
+
+
+
+<script language="javascript" type="text/javascript">
+    function Visible() {
+        var elt = document.getElementById('detail');
+        var bouton = document.getElementById('divFermer');
+
+        elt.setAttribute("class", "DivZoomCache");
+        bouton.setAttribute("class", "divFermerZoomCache");
+    }
+
+    function VisibleGraph(form) {
+        var elt = document.getElementById('graph' + form);
+
+
+        var contenant = document.getElementById('detail');
+        var bouton = document.getElementById('divFermer');
+
+        if (contenant != null && contenant.getAttribute("class") != "DivZoom") {
+            contenant.innerHTML = "";
+
+            var duplicate = elt.cloneNode(true);
+
+            var histo = duplicate.childNodes[0];
+            histo.src = histo.src + "&Zoom=O" + '.svg';
+
+//            histo.propertyIsEnumerable.width = "600px";
+//            histo.propertyIsEnumerable.heigth = "600px";
+
+            histo.setAttribute("width", "725px");
+            histo.setAttribute("height", "550px");
+
+            var elt2 = document.getElementById("dte" + form);
+            var elt3 = document.getElementById("dteZoom");
+            elt3.innerHTML = elt2.innerHTML;
+
+            contenant.appendChild(histo);
+
+            contenant.setAttribute("class", "DivZoom");
+            bouton.setAttribute("class", "divFermerZoom");
+        }
+    }
+</script>
+
+            
+            
+        
+</div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="FooterPanel">
+    </div>
+    <script type="text/javascript" src="Composants\Facturation\SuiviRevalorisation.js?1.5.38.15508&133667298260000000"></script>
+
+    <div>
+        <span id="ctl00_LabelVersion" class="LabelVersion" style="display: none">Pracdis.GE Build 1.5.38.15508</span>
+    </div>
+    <input type="hidden" name="ctl00$HiddenFieldPopupMessage" id="ctl00_HiddenFieldPopupMessage" value="Čekej prosím" />
+    <input type="hidden" name="ctl00$PopupYes" id="ctl00_PopupYes" value="Ano" />
+    <input type="hidden" name="ctl00$PopupNo" id="ctl00_PopupNo" value="Ne" />
+    <input type="hidden" name="ctl00$PopupError" id="ctl00_PopupError" value="Chyba" />
+    <input type="hidden" name="ctl00$PopupAreYouSure" id="ctl00_PopupAreYouSure" value="Si si jistý?" />
+    <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        function PopupMessage(message) {
+            var div = $("#popupMessage");
+            if (div.length !== 0) {
+                div.dialog("destroy");
+                div.detach();
+            }
+            div = $("<div id='popupMessage'></div>");
+            div.html("<img src='Images/loading.gif'/>" +
+                     "<span style='padding-left:10px; vertical-align: bottom;'>" +
+                     message +
+                     "</span>");
+            $("body").append(div);
+            div.dialog(
+            {
+                modal: true,
+                closeOnEscape: false,
+                resizable: false,
+                title: GetLocalMessage("ctl00_HiddenFieldPopupMessage", "Veuillez patienter"),
+                open: function (event, ui) { $(".ui-dialog-titlebar-close", ui.dialog || ui).hide(); }
+            });
+        }
+        function HidePopupMessage() {
+            $("#popupMessage").dialog("destroy");
+            $("#popupMessage").detach();
+        }
+        function PopupAlert(titre, message) {
+            var div = $("#popupAlert");
+            if (div.length !== 0) {
+                div.dialog("destroy");
+                div.detach();
+            }
+            div = $("<div id='popupAlert'></div>");
+            div.html("<span style='padding-left:10px; vertical-align: bottom;'>" +
+                     message +
+                     "</span>");
+            $("body").append(div);
+            div.dialog(
+            {
+                modal: true,
+                resizable: false,
+                title: titre,
+                buttons: [{
+                    text: "OK",
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }],
+                open: function (event, ui) { $(".ui-dialog-titlebar-close", ui.dialog || ui).hide(); }
+            });
+        }
+        $(document).ready(function () {
+            Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+                HidePopupMessage();
+            });
+        });
+        //]]>
+    </script>
+    
+
+<script type="text/javascript">
+//<![CDATA[
+Sys.Application.add_init(function() {
+    $create(Pracdis.Exchange.WebControls.Calendar.Behavior, {"cssClass":"Calendar","format":"Y","id":"ctl00_PHZonePrincipale_ctl01_CalendarMois","popupPosition":2,"selectMode":"month"}, null, null, $get("ctl00_PHZonePrincipale_ctl01_TextBoxMois"));
+});
+//]]>
+</script>
+</form>
+</body>
+</html>

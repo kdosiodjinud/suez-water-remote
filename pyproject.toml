@@ -1,0 +1,59 @@
+[project]
+name = "suez-water-remote"
+version = "0.1.0"
+description = "Home Assistant custom integration for the Suez Smart Solutions Czech portal (VHS Benešov)."
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [{name = "KdoSiOdJinud"}]
+dependencies = [
+  "aiohttp>=3.9",
+  "beautifulsoup4>=4.12",
+  "voluptuous>=0.13",
+  "yarl>=1.9",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+  "pytest-aiohttp>=1.0",
+  "aioresponses>=0.7.6",
+  "ruff>=0.6",
+  "mypy>=1.10",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["custom_components*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+  "E", "F", "W",       # pycodestyle / pyflakes
+  "I",                  # isort
+  "UP",                 # pyupgrade
+  "B",                  # bugbear
+  "SIM",                # simplifications
+  "RUF",                # ruff-specific
+  "ASYNC",              # async pitfalls
+]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests bootstrap sys.path / HA stubs in conftest before the package import.
+"tests/*.py" = ["E402", "I001"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+filterwarnings = [
+  "ignore::DeprecationWarning",
+]

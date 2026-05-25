@@ -1,0 +1,282 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="ctl00_MasterHead"><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge" /><title>
+
+</title><link href="CSS/Pracdis.css" rel="stylesheet" type="text/css" /><link href="CSS/WebMonthCalendar.css" rel="stylesheet" type="text/css" /><link href="CSS/DataGrid.css" rel="stylesheet" type="text/css" />
+        <link href="CSS/jquery/site/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <link href="CSS/jquery/jquery.jqplot.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="JS/utils.js"></script>
+    <script type="text/javascript" src="JS/ModalPopups.js"></script>
+    <script type="text/javascript" src="JS/jquery.js"></script>
+    <script type="text/javascript" src="JS/jquery.browser.js"></script>
+    <script type="text/javascript" src="JS/jquery.ui.js"></script>
+    <script type="text/javascript" src="JS/jquery.ddslick.js"></script>
+    <script type="text/javascript" src="JS/jquery.ddslick.extension.js"></script>
+    <link href="CSS/Pracdis.cs.css" rel="stylesheet" type="text/css" />
+    <link href="CSS/1024.cs.css" rel="stylesheet" type="text/css" />
+<link type="text/css" href="Themes/EMIS.CZ.VHS/CSS/EMIS_Default.css" rel="stylesheet" /></head>
+<body>
+    <form name="aspnetForm" method="post" action="./Login.aspx?ReturnUrl=%2feMIS.SE_VHS-Benesov%2fSite_Energie.aspx%3fAffichage%3dConsoMois&amp;Affichage=ConsoMois" id="aspnetForm">
+<div>
+<input type="hidden" name="__LASTFOCUS" id="__LASTFOCUS" value="" />
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUJMzYzMDA0OTYzD2QWAmYPZBYEAgEPZBYCAgcPFgIeB1Zpc2libGVoZAIDD2QWCAIDD2QWBAIBDxYCHgRocmVmBRVodHRwOi8vd3d3LnZocy1zcm8uY3oWAmYPFgIeA3NyYwUTSW1hZ2VzL0xvZ29TdXBwLnBuZ2QCAw8WAh4JaW5uZXJodG1sBTRWb2RvaG9zcG9kJiMyMjU7xZlzayYjMjI1OyBzcG9sZcSNbm9zdCBCZW5lxaFvdiBhLnMuZAIFD2QWAgIBDw8WAh4EVGV4dAURRMOhbGtvdsOpIG9kZcSNdHlkZAIHD2QWBgIBDxYCHwBoZAIDDxYCHwBoZAIFD2QWBAIFD2QWBAILDw8WAh8AaGRkAg0PDxYCHwBoZGQCBw9kFgICAQ8QZBAVBAlGcmFuw6dhaXMHRW5nbGlzaAdEZXV0c2NoBsSMZXNreRUEAmZyAmVuAmRlAmNzFCsDBGdnZ2cWAQIDZAIJDw8WAh8EBRdQcmFjZGlzLkdFIDEuNS4zOC4xNTUwOGRkZMmGuK/gNo3G8GleB31PVzqls5jy63vegVqa+gSisZoE" />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['aspnetForm'];
+if (!theForm) {
+    theForm = document.aspnetForm;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="/eMIS.SE_VHS-Benesov/WebResource.axd?d=rmjuk-nSZd1qqjKdT1I4QEJK9LNWrQNj_M2YZ_jKF74VRYdgC_ChHSvllWGEqs2GdROQHvmltVKR8ASy0hB2eDboHiVHDsV5UCkBpVlPcl81&amp;t=638942282819057530" type="text/javascript"></script>
+
+
+<script src="Themes/EMIS.CZ.VHS/JS/EMIS_Default.js" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+var __cultureInfo = {"name":"cs","numberFormat":{"CurrencyDecimalDigits":2,"CurrencyDecimalSeparator":",","IsReadOnly":false,"CurrencyGroupSizes":[3],"NumberGroupSizes":[3],"PercentGroupSizes":[3],"CurrencyGroupSeparator":" ","CurrencySymbol":"Kč","NaNSymbol":"NaN","CurrencyNegativePattern":8,"NumberNegativePattern":1,"PercentPositivePattern":0,"PercentNegativePattern":0,"NegativeInfinitySymbol":"-∞","NegativeSign":"-","NumberDecimalDigits":2,"NumberDecimalSeparator":",","NumberGroupSeparator":" ","CurrencyPositivePattern":3,"PositiveInfinitySymbol":"∞","PositiveSign":"+","PercentDecimalDigits":2,"PercentDecimalSeparator":",","PercentGroupSeparator":" ","PercentSymbol":"%","PerMilleSymbol":"‰","NativeDigits":["0","1","2","3","4","5","6","7","8","9"],"DigitSubstitution":1},"dateTimeFormat":{"AMDesignator":"dop.","Calendar":{"MinSupportedDateTime":"\/Date(-62135596800000)\/","MaxSupportedDateTime":"\/Date(253402297199999)\/","AlgorithmType":1,"CalendarType":1,"Eras":[1],"TwoDigitYearMax":2029,"IsReadOnly":false},"DateSeparator":".","FirstDayOfWeek":1,"CalendarWeekRule":2,"FullDateTimePattern":"dddd d. MMMM yyyy H:mm:ss","LongDatePattern":"dddd d. MMMM yyyy","LongTimePattern":"H:mm:ss","MonthDayPattern":"d. MMMM","PMDesignator":"odp.","RFC1123Pattern":"ddd, dd MMM yyyy HH\u0027:\u0027mm\u0027:\u0027ss \u0027GMT\u0027","ShortDatePattern":"dd.MM.yyyy","ShortTimePattern":"H:mm","SortableDateTimePattern":"yyyy\u0027-\u0027MM\u0027-\u0027dd\u0027T\u0027HH\u0027:\u0027mm\u0027:\u0027ss","TimeSeparator":":","UniversalSortableDateTimePattern":"yyyy\u0027-\u0027MM\u0027-\u0027dd HH\u0027:\u0027mm\u0027:\u0027ss\u0027Z\u0027","YearMonthPattern":"MMMM yyyy","AbbreviatedDayNames":["ne","po","út","st","čt","pá","so"],"ShortestDayNames":["ne","po","út","st","čt","pá","so"],"DayNames":["neděle","pondělí","úterý","středa","čtvrtek","pátek","sobota"],"AbbreviatedMonthNames":["led","úno","bře","dub","kvě","čvn","čvc","srp","zář","říj","lis","pro",""],"MonthNames":["leden","únor","březen","duben","květen","červen","červenec","srpen","září","říjen","listopad","prosinec",""],"IsReadOnly":false,"NativeCalendarName":"Gregoriánský kalendář","AbbreviatedMonthGenitiveNames":["led","úno","bře","dub","kvě","čvn","čvc","srp","zář","říj","lis","pro",""],"MonthGenitiveNames":["ledna","února","března","dubna","května","června","července","srpna","září","října","listopadu","prosince",""]},"eras":[1,"n. l.",null,0]};//]]>
+</script>
+
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=9WTJdPYwBWsuKkjeWxApmpoibrs_e4Ko-HsIYH_jpepQrLpKI70JCyLPPtnaRjbhhEXiGrX0sEd8KsYJap5G5L2yCxfI3aS8cuLYhdkzyTfZ2yn-J_TctolyC7hF1WndOK--OyeHCR5058MCJCyjAzzG-Aizp3ZIxZfVoML5rNcAxHZKRqIXgD1t68KDxeiC0&amp;t=32e5dfca" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+if (typeof(Sys) === 'undefined') throw new Error('ASP.NET Ajax client-side framework failed to load.');
+//]]>
+</script>
+
+<script src="/eMIS.SE_VHS-Benesov/ScriptResource.axd?d=G0oVbL2sQiWKykXhEFpHI4LZf1IrvIlfSSlMczGRumSoHEvtpGHnWHudKcjlMEyxkCxLe0Bf_TweFK3hUhWq-sxttHMqkusZnnvw_PuZ_fij89-F7jMyZGcNKlsrUU3rMY-C4ujL1fg_u2ipwCAPUNQowLv8JkvmOUUNwQvxIS7K8Imqy-6VZQI3IAfqOlml0&amp;t=32e5dfca" type="text/javascript"></script>
+<script src="/eMIS.SE_VHS-Benesov/WebResource.axd?d=NxyugToZ-emO7HvAAFDtlwmdcFc9WSsDiEMOz2cnOpZBABIZkl1v_o5dqe5ZhvDqVWqwwUF24KSB5-NrJy7KBfx4pSUN7pBA6Rljoq4_azE1&amp;t=638942282819057530" type="text/javascript"></script>
+<div>
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="6AC1BFC4" />
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdABA04ePyS3X81V1u/HQereb4ZKIPg1fTi8L4hqHOJBO8Lg+6q8Eo+7tz5qQnAfKOnqpc5WlVmJ1On/g7f38r5QBflZUTtS3OmK4UHHmkBuvCbiHGfvYb/Go3WS4nH8skXvGcYE5tzpB12qa0W4p0aDf8GHRTmCt3ezGIJCYBovIsXov1hDHKbF3WHECQ4S1kNEZfrFSq+mG2IfroHiUw6elOKufL89tWhUBr50CDBEV/F9hBluNUFQOCS/rEqBrKD+l+PhFCkNEGLSQXnlBZhdMMN4X+Owiikg7QYgIejiu/4iZ66sVo/JpGkrynmj5luAX3GaOWi+4gqo1VrO7+/0AYYwvSK2/zREpM0iQHnx+y2hGQ7gWcXS+AUg5ops+srRo=" />
+</div>
+    <script type="text/javascript">
+//<![CDATA[
+Sys.WebForms.PageRequestManager._initialize('ctl00$ScriptManager', 'aspnetForm', [], [], [], 90, 'ctl00');
+//]]>
+</script>
+
+    <div id="PanelPage">
+                <div id="ctl00_divLogoVHS" class="divLogoSupp">
+            <a href="http://www.vhs-sro.cz" id="ctl00_LienImage"><img src="Images/LogoSupp.png" id="ctl00_imgLogoSupp" /></a>&nbsp;<label id="ctl00_lblTitreLogoSupp" class="LogoSupp" title="Implémenter texte">Vodohospod&#225;řsk&#225; společnost Benešov a.s.</label>
+            <br /><br />
+        </div>
+        <div id="ctl00_PanelHeader" class="HeaderPanelLogin">
+	
+            <span id="ctl00_LabelTitre" class="FormulaireTitreHeader">Dálkové odečty</span>
+        
+</div>
+        <div id="PanelPageMenu">
+            <div id="ctl00_DIVPage">
+                <div id="master_content">
+                    
+                    
+                    <div id="master_contentplaceholder">
+                        
+    <table style="width: 100%; border-collapse: collapse; border-spacing: 0px">
+        <tr>
+            <td>
+                <div id="LogoLogin">
+                </div>
+            </td>
+            <td class="TDLogin">
+                <table width="100%" class="TitrePage">
+                    <tr>
+                        <td>
+                            <img src="images/puce1.png" alt="" />&nbsp;
+                            <span id="ctl00_PHZonePrincipale_lblConnexion" class="TitreCouleur">Přihlášeni</span>&nbsp;&nbsp;
+                            <img src="images/puce2.png" alt="" />&nbsp;
+                            <span id="ctl00_PHZonePrincipale_lblIdentification" class="TitreSimple"></span>&nbsp;&nbsp;
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <div id="ctl00_PHZonePrincipale_CadreIdentification" style="width:100%;">
+	
+                    <table id="CriteresRecherche" width="335px">
+                        <tr class="Critere">
+                            <td class="LibelleChamp" style="width: 200px; text-align: right">
+                                <span id="ctl00_PHZonePrincipale_LabelIdentifiant">Login:</span>
+                            </td>
+                            <td class="SaisieChamp">
+                                <input name="ctl00$PHZonePrincipale$TextBoxIdentifiant" type="text" id="ctl00_PHZonePrincipale_TextBoxIdentifiant" class="Information" style="width:180px;" />
+                            </td>
+                        </tr>
+                        <tr class="Critere">
+                            <td class="LibelleChamp" style="width: 200px; text-align: right">
+                                <span id="ctl00_PHZonePrincipale_LabelMotDePasse">Heslo:</span>
+                            </td>
+                            <td class="SaisieChamp">
+                                <input name="ctl00$PHZonePrincipale$TextBoxMotDePasse" type="password" id="ctl00_PHZonePrincipale_TextBoxMotDePasse" class="Information" style="width:180px;" />
+                            </td>
+                        </tr>
+                        <tr style='height: 30px'>
+                            <td>
+                            </td>
+                            <td>
+                                <input type="submit" name="ctl00$PHZonePrincipale$ButtonConnexion" value="Přihlásit" onclick="connexion_click();" id="ctl00_PHZonePrincipale_ButtonConnexion" class="Bouton" />
+                            </td>
+                        </tr>
+                        <tr class="Critere">
+                            <td align="left">
+                                
+                            </td>
+                            <td align="right">
+                                
+                            </td>
+                        </tr>
+                    </table>
+                
+</div>
+            </td>
+        </tr>
+    </table>
+    
+<div id="composants_navigation_langues_ascx">
+    <select name="ctl00$PHZonePrincipale$Langues$DropDownListLangues" onchange="javascript:setTimeout(&#39;__doPostBack(\&#39;ctl00$PHZonePrincipale$Langues$DropDownListLangues\&#39;,\&#39;\&#39;)&#39;, 0)" id="ctl00_PHZonePrincipale_Langues_DropDownListLangues">
+	<option value="fr" data-imagesrc="Images/flags/fr.png">Fran&#231;ais</option>
+	<option value="en" data-imagesrc="Images/flags/en.png">English</option>
+	<option value="de" data-imagesrc="Images/flags/de.png">Deutsch</option>
+	<option selected="selected" value="cs" data-imagesrc="Images/flags/cs.png">Česky</option>
+
+</select>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+$('#composants_navigation_langues_ascx').detach().appendTo($('form'));
+$(document).ready(function() {
+$('#ctl00_PHZonePrincipale_Langues_DropDownListLangues').ddslickext();
+});
+//]]>
+</script>
+
+<style>
+    .dd-container
+    {
+        margin: auto;
+    }
+</style>
+
+    <input name="ctl00$PHZonePrincipale$HiddenResolution" type="hidden" id="ctl00_PHZonePrincipale_HiddenResolution" />
+    <input name="ctl00$PHZonePrincipale$HiddenMessageConnexion" type="hidden" id="ctl00_PHZonePrincipale_HiddenMessageConnexion" value="Spojení se navazuje" />
+    <script type="text/javascript">
+        //<![CDATA[
+        var input = TrouverComposant("ctl00_PHZonePrincipale_HiddenResolution");
+        if (input != null) {
+            input.value = screen.width + "x" + screen.height;
+        }
+        var message = "Connexion en cours";
+        input = TrouverComposant("ctl00_PHZonePrincipale_HiddenMessageConnexion");
+        if (input != null) {
+            message = input.value;
+        }
+        function connexion_click() {
+            PopupMessage(message);
+            setTimeout("updateConnexion();", 2000);
+        }
+        function updateConnexion() {
+            // TAG : BUG plantage IE
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+                if ((request.readyState == 4) && (request.status == 200)) {
+                    HidePopupMessage();
+                    PopupMessage(message + "<br/><br/>" + request.responseText);
+                    setTimeout("updateConnexion();", 2000);
+                }
+            }
+            var user = document.getElementById("ctl00_PHZonePrincipale_TextBoxIdentifiant").value;
+            request.open("GET", "AjaxLogin.ashx?action=progress&user=" + user + "&timestamp=" + (new Date().getTime()), true);
+            request.send(null);
+        }
+        //]]>
+    </script>
+    <div id="divMessageResolution" class="ui-widget ui-helper-hidden" style="position: absolute">
+        <div class="ui-state-error">
+            <span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+            <span id="ctl00_PHZonePrincipale_LabelMessageResolution">Zjistilo se rozlišení obrazovky s méně než 1280 pixelů.<br/>Pokud si aktivoval zvětšení, vrať se na 100%.</span>
+        </div>
+    </div>
+    <script type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function () {
+            if (screen.width < 1280) {
+                $("#divMessageResolution").show().position({
+                    of: $(window),
+                    at: "middle bottom",
+                    my: "middle bottom"
+                });
+            }
+        });
+        //]]>
+    </script>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="FooterPanel">
+    </div>
+    <div>
+        <span id="ctl00_LabelVersion" class="LabelVersion">Pracdis.GE 1.5.38.15508</span>
+    </div>
+    <input type="hidden" name="ctl00$HiddenFieldPopupMessage" id="ctl00_HiddenFieldPopupMessage" value="Čekej prosím" />
+    <input type="hidden" name="ctl00$PopupYes" id="ctl00_PopupYes" value="Oui" />
+    <input type="hidden" name="ctl00$PopupNo" id="ctl00_PopupNo" value="Non" />
+    <input type="hidden" name="ctl00$PopupError" id="ctl00_PopupError" value="Erreur" />
+    <input type="hidden" name="ctl00$PopupAreYouSure" id="ctl00_PopupAreYouSure" value="Etes-vous sûr(e)?" />
+    <script language="javascript" type="text/javascript">
+<!--
+        function PopupMessage(message) {
+            var div = $("#popupMessage");
+            if (div.length == 0)
+                div = $("<div id='popupMessage'></div>");
+            div.html("<img src='Images/loading.gif' style='vertical-align: middle;'/>" +
+                     "<span style='padding-left:10px; vertical-align: middle;'>" +
+                     message +
+                     "</span>");
+            $("body").append(div);
+            div.dialog(
+            {
+                modal: true,
+                closeOnEscape: false,
+                resizable: false,
+                title: GetLocalMessage("ctl00_HiddenFieldPopupMessage", "Veuillez patienter"),
+                open: function (event, ui) { $(".ui-dialog-titlebar-close").hide(); }
+            });
+        }
+        function HidePopupMessage() {
+            $("#popupMessage").dialog("destroy");
+            $("#popupMessage").detach();
+        }
+        $(document).ready(function () {
+            Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+                HidePopupMessage();
+            });
+        });
+-->
+    </script>
+    
+
+<script type="text/javascript">
+//<![CDATA[
+WebForm_AutoFocus('ctl00_PHZonePrincipale_TextBoxIdentifiant');//]]>
+</script>
+</form>
+</body>
+</html>
