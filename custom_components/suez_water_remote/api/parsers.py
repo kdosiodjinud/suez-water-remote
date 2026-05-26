@@ -188,7 +188,7 @@ def parse_home_page(
     soup = BeautifulSoup(html, "html.parser")
     label = soup.find("span", id=_TITRE_LABEL_ID)
     if label is None:
-        raise SuezParseError("missing site title label")
+        raise SuezParseError(_describe_unexpected_page(soup, "site title label"))
     site_label = _normalize(label.get_text())
     meter_id = site_label.rsplit("-", 1)[-1] if "-" in site_label else site_label
 
@@ -490,3 +490,25 @@ def discover_meter_ids(html: str) -> tuple[str, ...]:
 def _iter_text(elements: Iterable[Tag]) -> Iterable[str]:
     for element in elements:
         yield _normalize(element.get_text())
+
+
+_USERNAME_INPUT_NAME = "ctl00$PHZonePrincipale$TextBoxIdentifiant"
+
+
+def _describe_unexpected_page(soup: BeautifulSoup, missing: str) -> str:
+    """Build a diagnostic string for parse errors on the home page.
+
+    Includes the page ``<title>`` and a flag noting whether the response
+    contains the login form, so operators can tell stale-session redirects
+    apart from a portal redesign by reading the log.
+    """
+    title_tag = soup.find("title")
+    page_title = _normalize(title_tag.get_text()) if title_tag else ""
+    has_login_form = (
+        soup.find("input", attrs={"name": _USERNAME_INPUT_NAME}) is not None
+    )
+    parts = [f"missing {missing}"]
+    if page_title:
+        parts.append(f"page title: {page_title!r}")
+    parts.append(f"login form present: {has_login_form}")
+    return "; ".join(parts)

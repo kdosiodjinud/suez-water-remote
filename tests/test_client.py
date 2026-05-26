@@ -289,6 +289,65 @@ async def test_from_url_factory_builds_client_with_correct_base() -> None:
         await client.close()
 
 
+async def test_fetch_snapshot_recovers_from_stale_session() -> None:
+    """A stale auth cookie triggers a 302 to login: force re-login and retry.
+
+    Reproduces the ``portal error: missing site title label`` scenario: the
+    integration polls every 6 hours, ASP.NET FormsAuth expires server-side
+    after ~30 min, the cookie keeps living in our in-memory jar, so the
+    next GET ``Site.aspx`` is redirected to ``Login.aspx`` and the parser
+    sees a page with no site title. The fix is a one-shot re-login + retry.
+    """
+    from multidict import CIMultiDict
+
+    from aioresponses.core import CallbackResult
+
+    def _login_callback(url, **kwargs):
+        headers = CIMultiDict()
+        headers.add("Location", f"{BASE}Site.aspx")
+        for cookie in _set_cookie_success():
+            headers.add("Set-Cookie", cookie)
+        return CallbackResult(status=302, headers=headers)
+
+    client = SuezVhsClient("user", "pass", BASE, locale=LOCALE_CS)
+    # Seed a stale cookie so the first home fetch is "authenticated" from
+    # the client's point of view, yet the portal will redirect to login.
+    client._ingest_set_cookie(_set_cookie_success())
+    client._logged_in = True
+
+    with aioresponses() as m:
+        # First GET to Site.aspx mimics ASP.NET's session-expired redirect.
+        m.get(HOME_URL, status=200, body=fixture("login.html"))
+        # Re-login flow: GET Site.aspx (still login form), POST credentials.
+        m.get(HOME_URL, status=200, body=fixture("login.html"))
+        m.post(LOGIN_POST_RE, callback=_login_callback)
+        # Final GET after fresh auth succeeds with the real home page.
+        m.get(HOME_URL, status=200, body=fixture("home.html"))
+        _register_data_pages(m)
+        snap = await client.async_fetch_snapshot()
+    await client.close()
+
+    assert snap.meter_id == "1234567"
+    assert snap.site_label == "99999-XX-1234567"
+
+
+async def test_fetch_snapshot_raises_auth_error_when_relogin_also_redirects() -> None:
+    """If the portal keeps redirecting after re-login, surface a re-auth signal."""
+    client = SuezVhsClient("user", "pass", BASE, locale=LOCALE_CS)
+    client._ingest_set_cookie(_set_cookie_success())
+    client._logged_in = True
+
+    with aioresponses() as m:
+        # Three GETs to Site.aspx: initial (stale), re-login GET, post-relogin GET.
+        m.get(HOME_URL, status=200, body=fixture("login.html"))
+        m.get(HOME_URL, status=200, body=fixture("login.html"))
+        # Re-login POST silently fails (login form returned, no auth cookie).
+        m.post(LOGIN_POST_RE, status=200, body=fixture("login.html"))
+        with pytest.raises(SuezAuthenticationError):
+            await client.async_fetch_snapshot()
+    await client.close()
+
+
 async def test_from_url_factory_pinned_locale_overrides_autodetect() -> None:
     client = SuezVhsClient.from_url(
         "https://cz-sitr.suezsmartsolutions.com/eMIS.SE_VHS-Benesov/Login.aspx",

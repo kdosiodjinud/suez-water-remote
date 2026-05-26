@@ -85,6 +85,14 @@ _HEADERS_BASE: Final = {
 # root encodes the branch (``eMIS.SE_VHS-Benesov`` for example).
 _ASPX_PAGE_RE = re.compile(r"/[^/]+\.aspx$", re.IGNORECASE)
 
+# Used by ``_is_login_redirect`` to spot a page that contains the username
+# input of the login form. The ``$`` in ``ctl00$PHZonePrincipale$...`` is
+# escaped so the pattern matches the verbatim attribute value.
+_LOGIN_FORM_INPUT_RE = re.compile(
+    r'name="ctl00\$PHZonePrincipale\$TextBoxIdentifiant"',
+    re.IGNORECASE,
+)
+
 
 def derive_base_url(user_url: str) -> URL:
     """Strip the page name from a portal URL to produce the application root.
@@ -245,22 +253,30 @@ class SuezVhsClient:
 
     # -- public API ----------------------------------------------------------
 
-    async def async_login(self) -> None:
+    async def async_login(self, *, force: bool = False) -> None:
         """Perform an explicit login.
 
-        Idempotent: when an authentication cookie is already present it
-        returns immediately.
+        Idempotent by default: when an authentication cookie is already
+        present it returns immediately. Pass ``force=True`` to discard any
+        stale session and re-authenticate unconditionally — used when the
+        portal redirected an authenticated request back to the login page.
         """
         async with self._login_lock:
-            if self._has_auth_cookie():
+            if not force and self._has_auth_cookie():
                 self._logged_in = True
                 return
+            if force:
+                # Cookie can outlive the server-side session: keeping it would
+                # short-circuit ``_has_auth_cookie`` checks and prevent the
+                # fresh POST from re-populating the jar reliably.
+                self._session.cookie_jar.clear_domain(self._base_url.host or "")
+                self._logged_in = False
             await self._login_locked()
 
     async def async_discover_meters(self) -> tuple[str, ...]:
         """Return every meter identifier visible on the home page."""
         await self._ensure_logged_in()
-        html = await self._fetch_html(self._url(HOME_PATH))
+        html = await self._fetch_authenticated_html(self._url(HOME_PATH))
         meters = discover_meter_ids(html)
         if not meters:
             raise SuezParseError("no meters were discovered on the home page")
@@ -269,7 +285,7 @@ class SuezVhsClient:
     async def async_fetch_snapshot(self, meter_id: str | None = None) -> MeterSnapshot:
         """Fetch the full dataset for ``meter_id`` (or the single account meter)."""
         await self._ensure_logged_in()
-        home_html = await self._fetch_html(self._url(HOME_PATH))
+        home_html = await self._fetch_authenticated_html(self._url(HOME_PATH))
         site_label, discovered_meter, current, today_total = parse_home_page(
             home_html, self._locale
         )
@@ -421,6 +437,52 @@ class SuezVhsClient:
     async def _fetch_html(self, url: URL) -> str:
         async with self._request("GET", url) as resp:
             return await resp.text()
+
+    def _is_login_redirect(self, final_url: URL, html: str) -> bool:
+        """Return ``True`` when an authenticated GET landed on the login page.
+
+        ASP.NET FormsAuthentication expires the session server-side while the
+        client-side cookie keeps living in our in-memory jar; subsequent
+        GETs are then 302'd back to ``Login.aspx``. We detect this both by
+        the final URL (real portal: 302 chain follows to ``Login.aspx``) and
+        by the response body (presence of the login form input), which keeps
+        the check robust against server tweaks that swap one signal for the
+        other.
+        """
+        path = (final_url.path or "").rstrip("/").lower()
+        if path.endswith("/" + LOGIN_PATH.lower()) or path == LOGIN_PATH.lower():
+            return True
+        return _LOGIN_FORM_INPUT_RE.search(html) is not None
+
+    async def _fetch_authenticated_html(self, url: URL) -> str:
+        """Fetch ``url`` expecting a post-login response.
+
+        When the portal redirects us back to the login page (stale session),
+        we drop the cookie jar, perform a fresh login under the login lock,
+        and retry exactly once. A second redirect means the credentials no
+        longer work, so we raise :class:`SuezAuthenticationError` to surface
+        a Home Assistant re-auth prompt.
+        """
+        async with self._request("GET", url) as resp:
+            final_url = resp.url
+            text = await resp.text()
+        if not self._is_login_redirect(final_url, text):
+            return text
+        _LOGGER.debug(
+            "session stale: GET %s landed on %s; forcing re-login",
+            url.path,
+            final_url.path,
+        )
+        await self.async_login(force=True)
+        async with self._request("GET", url) as resp:
+            final_url = resp.url
+            text = await resp.text()
+        if self._is_login_redirect(final_url, text):
+            raise SuezAuthenticationError(
+                f"portal redirected to login page after re-authentication "
+                f"(final URL: {final_url.path})"
+            )
+        return text
 
     @asynccontextmanager
     async def _request(
