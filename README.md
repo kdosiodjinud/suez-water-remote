@@ -32,12 +32,29 @@ raw label exactly as the portal sends it.
 
 ### Energy dashboard (water)
 
-Because the portal publishes daily figures with a delay, the integration also
-imports **long-term statistics** with each day's real timestamp (external
-statistic `suez_water_remote:water_<meter id>`, in m³). Daily consumption is
-therefore attributed to the correct day even when the data arrives late.
-Add it under **Settings → Dashboards → Energy → Water consumption**. This needs
-the `recorder` integration (declared as a dependency).
+The portal publishes daily figures with a delay, so a live sensor would record
+them under the wrong day. To avoid this, the integration imports **long-term
+statistics** with each day's real timestamp, as an external statistic.
+
+To add water to the Energy dashboard:
+
+1. Go to **Settings → Dashboards → Energy → Water consumption → Add water source**.
+2. Pick the statistic named **`Suez Smart Solutions water <meter id>`**
+   (id `suez_water_remote:water_<meter id>`, unit m³).
+
+> **Important — pick the statistic, not a sensor.** Do **not** select the
+> *Meter total* sensor here: it carries the portal's delay and would shift your
+> daily usage onto the wrong day. The external statistic above is the one that
+> attributes each day's consumption to its correct date.
+
+Notes:
+
+- The statistic only appears **after the first successful refresh** following
+  setup/upgrade. If you don't see it yet, press the **Refresh now** button (or
+  wait for the next poll), then add the water source again.
+- This needs the `recorder` integration (declared as a dependency).
+- `<meter id>` is your meter number (the part after the last dash in the device
+  name / site label).
 
 The integration **derives everything** (country sub-domain, branch path,
 UI locale) from a single URL you paste in. No country/branch hard-codes.
@@ -87,11 +104,23 @@ When the portal exposes more than one meter on the account, a second step
 lets you pick which ones to monitor. For single-meter accounts the flow
 finishes after the credentials step.
 
-## Update cadence
+## Update cadence and data freshness
 
-The upstream telemetry refreshes once per day around 23:00 local time, so
-the integration polls **every 6 hours** by default — frequent enough to
-see new data within the next morning, but light on the portal.
+**Daily consumption is not real-time.** It comes from Suez's metering hardware
+and portal, which publish a day's figures only after the device reports them —
+typically once a day, around 23:00 local time, and often with a lag of a day or
+more. Until a given day is published:
+
+- **Today / yesterday consumption** reports `0` (not the previous day's value);
+  the `measured_date` / `data_available` attributes show whether the `0` is a
+  real measurement or "not published yet".
+- The **Energy dashboard** statistic backfills each day onto its correct date as
+  soon as the portal makes it available.
+
+The integration polls **every 6 hours** by default — enough to pick up new data
+within the next morning, while staying light on the portal. The **Refresh now**
+button re-fetches whatever the portal currently holds; it **cannot** make Suez
+publish a day's reading sooner.
 
 ## Re-authentication
 
