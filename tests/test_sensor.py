@@ -84,27 +84,58 @@ def _alarm(*params: AlarmConfigParameter, alarm_type: str = "Spotřeba") -> Alar
     )
 
 
-def test_alarm_builder_skips_empty_params_and_labels_by_value() -> None:
+def test_alarm_builder_skips_empty_params() -> None:
+    # Two configured slots + one empty -> active + exactly two param sensors,
+    # slot-indexed keys preserved. Unknown labels keep the empty slot skipped.
+    cfg = _alarm(
+        AlarmConfigParameter(label="Seuil A", value="5", value_numeric=5.0),
+        AlarmConfigParameter(label="Seuil B", value="2", value_numeric=2.0),
+        alarm_type="Alerte inconnue",
+    )
+    keys = [d.key for d in sensor._alarm_sensors_for(cfg)]
+    assert keys == ["alarm_1_active", "alarm_1_param_1", "alarm_1_param_2"]
+
+
+def test_alarm_builder_localizes_known_concepts_cs() -> None:
     cfg = _alarm(
         AlarmConfigParameter(label="Mez nadměrné spotřeby", value="800", value_numeric=800.0),
         AlarmConfigParameter(label="Počet dnů", value="1", value_numeric=1.0),
         alarm_type="Upozornění na příliš velikou spotřebu",
     )
     descs = sensor._alarm_sensors_for(cfg)
-    keys = [d.key for d in descs]
-    assert keys == ["alarm_1_active", "alarm_1_param_1", "alarm_1_param_2"]
+    # Known concepts -> localized translation keys, no raw-text placeholders.
+    assert descs[0].translation_key == "alarm_active_overconsumption"
+    assert descs[0].translation_placeholders is None
+    assert descs[1].translation_key == "alarm_param_overconsumption_threshold"
+    assert descs[1].translation_placeholders is None
+    assert descs[2].translation_key == "alarm_param_number_of_days"
 
-    active = descs[0]
-    assert active.translation_key == "alarm_active"
-    assert active.translation_placeholders == {
-        "alarm_type": "Upozornění na příliš velikou spotřebu"
-    }
 
-    param1 = descs[1]
-    assert param1.translation_key == "alarm_param"
-    assert param1.translation_placeholders == {
-        "alarm_type": "Upozornění na příliš velikou spotřebu",
-        "param_label": "Mez nadměrné spotřeby",
+def test_alarm_builder_localizes_known_concepts_en() -> None:
+    # Same concepts recognised when the portal session serves English labels.
+    cfg = _alarm(
+        AlarmConfigParameter(label="Overconsumption threshold", value="800", value_numeric=800.0),
+        AlarmConfigParameter(label="Number of days", value="1", value_numeric=1.0),
+        alarm_type="Overconsumption alert",
+    )
+    descs = sensor._alarm_sensors_for(cfg)
+    assert descs[0].translation_key == "alarm_active_overconsumption"
+    assert descs[1].translation_key == "alarm_param_overconsumption_threshold"
+    assert descs[2].translation_key == "alarm_param_number_of_days"
+
+
+def test_alarm_builder_falls_back_to_raw_for_unknown() -> None:
+    cfg = _alarm(
+        AlarmConfigParameter(label="Seuil de débit", value="5", value_numeric=5.0),
+        alarm_type="Alerte de débit",
+    )
+    descs = sensor._alarm_sensors_for(cfg)
+    assert descs[0].translation_key == "alarm_active"
+    assert descs[0].translation_placeholders == {"alarm_type": "Alerte de débit"}
+    assert descs[1].translation_key == "alarm_param"
+    assert descs[1].translation_placeholders == {
+        "alarm_type": "Alerte de débit",
+        "param_label": "Seuil de débit",
     }
 
 

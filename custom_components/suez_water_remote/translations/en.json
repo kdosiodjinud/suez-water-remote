@@ -90,8 +90,28 @@
           "off": "Off"
         }
       },
+      "alarm_active_overconsumption": {
+        "name": "Overconsumption – active",
+        "state": {
+          "on": "On",
+          "off": "Off"
+        }
+      },
+      "alarm_active_leak": {
+        "name": "Leak – active",
+        "state": {
+          "on": "On",
+          "off": "Off"
+        }
+      },
       "alarm_param": {
         "name": "{alarm_type}: {param_label}"
+      },
+      "alarm_param_overconsumption_threshold": {
+        "name": "Overconsumption threshold"
+      },
+      "alarm_param_number_of_days": {
+        "name": "Number of days"
       }
     },
     "button": {

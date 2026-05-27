@@ -32,6 +32,7 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
+from .statistics import async_update_meter_statistics
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -92,4 +93,9 @@ class SuezWaterCoordinator(DataUpdateCoordinator[SuezData]):
             raise UpdateFailed(f"network error: {err}") from err
         except SuezError as err:
             raise UpdateFailed(f"portal error: {err}") from err
+        # Backfill long-term statistics with the real per-day timestamps so the
+        # Energy dashboard attributes consumption to the correct day even when
+        # the portal publishes it late.
+        for snapshot in results.values():
+            async_update_meter_statistics(self.hass, snapshot)
         return SuezData(meters=results)

@@ -16,10 +16,28 @@ served from sub-domains like `cz-sitr.suezsmartsolutions.com`,
 | This / last year consumption | m³ | `total` | From the yearly table |
 | Alarm count | — | `measurement` | Number of recent threshold alarms |
 | Latest alarm | datetime | — | When the most recent alarm fired |
-| `<alarm type>` – active | `on`/`off` | — | One per configured alarm; type/email/phone and configured parameter labels in attributes |
-| `<alarm type>: <parameter>` | — | — | One per *configured* parameter slot, named after the portal's own label (e.g. "Mez nadměrné spotřeby"); empty slots are omitted |
+| `<alarm>` – active | `on`/`off` | — | One per configured alarm; type/email/phone and configured parameter labels in attributes |
+| `<alarm>: <parameter>` | — | — | One per *configured* parameter slot; empty slots are omitted |
 
 A **Refresh now** button is also created per meter to fetch the latest data on demand.
+
+### Alarm names
+
+The portal exposes alarm labels only as localized free text, with no
+language-independent code. Common alarms (overconsumption, leak, and their
+threshold / number-of-days parameters) are recognised in **Czech and English**
+and named via Home Assistant translations, so they follow your HA UI language.
+Any other alarm type — or a French/German portal session — falls back to the
+raw label exactly as the portal sends it.
+
+### Energy dashboard (water)
+
+Because the portal publishes daily figures with a delay, the integration also
+imports **long-term statistics** with each day's real timestamp (external
+statistic `suez_water_remote:water_<meter id>`, in m³). Daily consumption is
+therefore attributed to the correct day even when the data arrives late.
+Add it under **Settings → Dashboards → Energy → Water consumption**. This needs
+the `recorder` integration (declared as a dependency).
 
 The integration **derives everything** (country sub-domain, branch path,
 UI locale) from a single URL you paste in. No country/branch hard-codes.

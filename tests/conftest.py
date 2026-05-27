@@ -15,6 +15,7 @@ from __future__ import annotations
 import sys
 import types
 from pathlib import Path
+from unittest.mock import Mock
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
@@ -163,6 +164,13 @@ def _stub_homeassistant() -> None:
          ButtonEntityDescription=_ButtonEntityDescription)
     make("homeassistant.components.diagnostics",
          async_redact_data=lambda d, _: d)
+    make("homeassistant.components.recorder")
+    # StatisticData / StatisticMetadata are TypedDicts in HA, i.e. plain dicts
+    # at runtime — ``dict(**kwargs)`` mirrors their construction.
+    make("homeassistant.components.recorder.models",
+         StatisticData=dict, StatisticMetadata=dict)
+    make("homeassistant.components.recorder.statistics",
+         async_add_external_statistics=Mock())
     make("homeassistant.util")
     make("homeassistant.util.dt",
          as_utc=lambda d: d, as_local=lambda d: d)

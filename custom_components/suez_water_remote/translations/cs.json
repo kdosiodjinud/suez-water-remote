@@ -90,8 +90,28 @@
           "off": "Vypnuto"
         }
       },
+      "alarm_active_overconsumption": {
+        "name": "Příliš velká spotřeba – aktivní",
+        "state": {
+          "on": "Zapnuto",
+          "off": "Vypnuto"
+        }
+      },
+      "alarm_active_leak": {
+        "name": "Netěsnost – aktivní",
+        "state": {
+          "on": "Zapnuto",
+          "off": "Vypnuto"
+        }
+      },
       "alarm_param": {
         "name": "{alarm_type}: {param_label}"
+      },
+      "alarm_param_overconsumption_threshold": {
+        "name": "Mez nadměrné spotřeby"
+      },
+      "alarm_param_number_of_days": {
+        "name": "Počet dnů"
       }
     },
     "button": {

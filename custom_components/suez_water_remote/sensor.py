@@ -18,6 +18,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
+from .alarm_labels import alarm_param_concept, alarm_type_concept
 from .api import AlarmConfig, ConsumptionPoint, MeterSnapshot
 from .coordinator import SuezConfigEntry, SuezWaterCoordinator
 from .entity import meter_device_info
@@ -352,11 +353,22 @@ def _alarm_sensors_for(config: AlarmConfig) -> tuple[SuezSensorDescription, ...]
     even if the user later fills another slot.
     """
     cid = config.config_id
+    # Known concepts (recognised in cs/en) get a localized translation key so
+    # the name follows HA's UI language; everything else falls back to the raw
+    # portal label carried as a placeholder. See ``alarm_labels``.
+    type_concept = alarm_type_concept(config.alarm_type)
+    if type_concept is not None:
+        active_key = f"alarm_active_{type_concept}"
+        active_placeholders: dict[str, str] | None = None
+    else:
+        active_key = "alarm_active"
+        active_placeholders = {"alarm_type": config.alarm_type}
+
     descriptions: list[SuezSensorDescription] = [
         SuezSensorDescription(
             key=f"alarm_{cid}_active",
-            translation_key="alarm_active",
-            translation_placeholders={"alarm_type": config.alarm_type},
+            translation_key=active_key,
+            translation_placeholders=active_placeholders,
             device_class=SensorDeviceClass.ENUM,
             options=list(_ALARM_ACTIVE_OPTIONS),
             icon="mdi:bell-alert",
@@ -367,14 +379,21 @@ def _alarm_sensors_for(config: AlarmConfig) -> tuple[SuezSensorDescription, ...]
     for slot, param in enumerate(config.parameters):
         if not param.is_configured:
             continue
+        param_concept = alarm_param_concept(param.label)
+        if param_concept is not None:
+            param_key = f"alarm_param_{param_concept}"
+            param_placeholders: dict[str, str] | None = None
+        else:
+            param_key = "alarm_param"
+            param_placeholders = {
+                "alarm_type": config.alarm_type,
+                "param_label": param.label,
+            }
         descriptions.append(
             SuezSensorDescription(
                 key=f"alarm_{cid}_param_{slot + 1}",
-                translation_key="alarm_param",
-                translation_placeholders={
-                    "alarm_type": config.alarm_type,
-                    "param_label": param.label,
-                },
+                translation_key=param_key,
+                translation_placeholders=param_placeholders,
                 icon="mdi:bell-cog",
                 value_fn=_alarm_param_state(cid, slot),
                 attrs_fn=_alarm_param_attrs(cid, slot),
