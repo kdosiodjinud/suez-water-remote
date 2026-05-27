@@ -165,10 +165,11 @@ def _stub_homeassistant() -> None:
     make("homeassistant.components.diagnostics",
          async_redact_data=lambda d, _: d)
     make("homeassistant.components.recorder")
-    # StatisticData / StatisticMetadata are TypedDicts in HA, i.e. plain dicts
-    # at runtime — ``dict(**kwargs)`` mirrors their construction.
+    # StatisticData / StatisticMetaData are TypedDicts in HA, i.e. plain dicts
+    # at runtime — ``dict(**kwargs)`` mirrors their construction. The names MUST
+    # match the real HA API exactly, otherwise the stub masks a bad import.
     make("homeassistant.components.recorder.models",
-         StatisticData=dict, StatisticMetadata=dict)
+         StatisticData=dict, StatisticMetaData=dict)
     make("homeassistant.components.recorder.statistics",
          async_add_external_statistics=Mock())
     make("homeassistant.util")

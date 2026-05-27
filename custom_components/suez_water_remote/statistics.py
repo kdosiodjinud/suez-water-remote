@@ -16,7 +16,7 @@ live entity.
 
 from __future__ import annotations
 
-from homeassistant.components.recorder.models import StatisticData, StatisticMetadata
+from homeassistant.components.recorder.models import StatisticData, StatisticMetaData
 from homeassistant.components.recorder.statistics import async_add_external_statistics
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.util import dt as dt_util
@@ -63,7 +63,7 @@ def async_update_meter_statistics(
     stats = build_statistics(snapshot)
     if not stats:
         return
-    metadata = StatisticMetadata(
+    metadata = StatisticMetaData(
         has_mean=False,
         has_sum=True,
         name=f"{MANUFACTURER} water {snapshot.meter_id}",
