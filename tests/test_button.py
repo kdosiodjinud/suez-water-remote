@@ -6,7 +6,10 @@ from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
 from unittest.mock import AsyncMock
 
-from custom_components.suez_water_remote.button import SuezRefreshButton
+from custom_components.suez_water_remote.button import (
+    SuezBackfillButton,
+    SuezRefreshButton,
+)
 
 if TYPE_CHECKING:
     from custom_components.suez_water_remote.coordinator import SuezWaterCoordinator
@@ -17,6 +20,7 @@ def _coordinator() -> SimpleNamespace:
         data=None,
         client=SimpleNamespace(base_url="https://cz-sitr.example/eMIS.SE_X/"),
         async_request_refresh=AsyncMock(),
+        async_backfill_meter=AsyncMock(),
     )
 
 
@@ -41,3 +45,19 @@ async def test_button_press_triggers_refresh() -> None:
     button = SuezRefreshButton(cast("SuezWaterCoordinator", coordinator), "1234567")
     await button.async_press()
     coordinator.async_request_refresh.assert_awaited_once()
+
+
+def test_backfill_button_identity_and_availability() -> None:
+    coordinator = _coordinator()
+    coordinator.last_update_success = False
+    button = SuezBackfillButton(cast("SuezWaterCoordinator", coordinator), "1234567")
+    assert button._attr_unique_id == "1234567_backfill"
+    assert button._attr_translation_key == "backfill"
+    assert button.available is True
+
+
+async def test_backfill_button_press_triggers_backfill() -> None:
+    coordinator = _coordinator()
+    button = SuezBackfillButton(cast("SuezWaterCoordinator", coordinator), "1234567")
+    await button.async_press()
+    coordinator.async_backfill_meter.assert_awaited_once_with("1234567")

@@ -117,6 +117,9 @@
     "button": {
       "refresh": {
         "name": "Refresh now"
+      },
+      "backfill": {
+        "name": "Import history"
       }
     }
   }

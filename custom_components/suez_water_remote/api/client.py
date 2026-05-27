@@ -58,7 +58,7 @@ from .exceptions import (
     SuezParseError,
 )
 from .locales import DEFAULT_LOCALE, Locale, detect_locale
-from .models import MeterSnapshot
+from .models import MeterReading, MeterSnapshot
 from .parsers import (
     discover_meter_ids,
     extract_hidden_inputs,
@@ -339,6 +339,26 @@ class SuezVhsClient:
             alarm_configs=parse_alarm_configs(alarms_config_html, self._locale),
         )
 
+    async def async_fetch_daily_index(
+        self, meter_id: str, *, complete: bool = True
+    ) -> tuple[MeterReading, ...]:
+        """Fetch the per-day cumulative meter readings.
+
+        With ``complete=True`` the portal returns the full daily history
+        (``PeriodeComplete``), used for the one-time statistics backfill.
+        Returns an empty tuple when the table is absent so a backfill can
+        never bring the integration down.
+        """
+        await self._ensure_logged_in()
+        html = await self._fetch_authenticated_html(
+            self._index_url(AFFICHAGE_INDEX_DAY, complete=complete)
+        )
+        try:
+            return parse_daily_index(html, meter_id, self._locale)
+        except SuezParseError:
+            _LOGGER.debug("daily index table missing for meter %s", meter_id)
+            return ()
+
     # -- private helpers -----------------------------------------------------
 
     def _has_auth_cookie(self) -> bool:
@@ -356,12 +376,15 @@ class SuezVhsClient:
     def _energy_url(self, affichage: str) -> URL:
         return self._url(ENERGY_PATH).with_query({"Affichage": affichage})
 
-    def _index_url(self, affichage: str) -> URL:
+    def _index_url(self, affichage: str, *, complete: bool = False) -> URL:
+        # ``PeriodeComplete=true`` makes the portal return the full daily
+        # series instead of just the recent window — used for the one-time
+        # history backfill.
         return self._url(ENERGY_PATH).with_query(
             {
                 "Affichage": affichage,
                 "IndexesSepares": "true",
-                "PeriodeComplete": "false",
+                "PeriodeComplete": "true" if complete else "false",
             }
         )
 

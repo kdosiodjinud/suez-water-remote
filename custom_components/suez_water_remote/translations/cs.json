@@ -117,6 +117,9 @@
     "button": {
       "refresh": {
         "name": "Načíst aktuální data"
+      },
+      "backfill": {
+        "name": "Importovat historii"
       }
     }
   }

@@ -29,6 +29,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: SuezConfigEntry) -> bool
     entry.runtime_data = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_options_updated))
+    # Import the full daily history into statistics in the background, so the
+    # Energy dashboard shows older days too. Idempotent and non-blocking — it
+    # must not delay or fail setup.
+    entry.async_create_background_task(
+        hass, coordinator.async_backfill(), "suez_water_remote_backfill"
+    )
     return True
 
 

@@ -16,12 +16,14 @@ live entity.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from homeassistant.components.recorder.models import StatisticData, StatisticMetaData
 from homeassistant.components.recorder.statistics import async_add_external_statistics
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.util import dt as dt_util
 
-from .api import MeterSnapshot
+from .api import MeterReading
 from .const import DOMAIN, MANUFACTURER
 
 # m³ is one of the volume units the Energy dashboard accepts for water.
@@ -33,15 +35,16 @@ def statistic_id(meter_id: str) -> str:
     return f"{DOMAIN}:water_{meter_id}"
 
 
-def build_statistics(snapshot: MeterSnapshot) -> list[StatisticData]:
-    """Build cumulative daily statistics from a snapshot's daily index.
+def build_statistics(readings: Iterable[MeterReading]) -> list[StatisticData]:
+    """Build cumulative daily statistics from per-day meter readings.
 
     Each point uses the day's reading timestamp (already 23:00 local, i.e.
     hour-aligned) made timezone-aware, and the cumulative meter value as both
-    ``sum`` and ``state``. Points are returned in ascending time order.
+    ``sum`` and ``state``. Points are returned in ascending time order. Works
+    the same whether fed the recent polling window or the full history.
     """
     stats: list[StatisticData] = []
-    for reading in sorted(snapshot.daily_index, key=lambda r: r.timestamp):
+    for reading in sorted(readings, key=lambda r: r.timestamp):
         start = dt_util.as_local(reading.timestamp).replace(
             minute=0, second=0, microsecond=0
         )
@@ -56,19 +59,19 @@ def build_statistics(snapshot: MeterSnapshot) -> list[StatisticData]:
 
 
 @callback
-def async_update_meter_statistics(
-    hass: HomeAssistant, snapshot: MeterSnapshot
+def async_import_meter_statistics(
+    hass: HomeAssistant, meter_id: str, readings: Iterable[MeterReading]
 ) -> None:
-    """Import the cumulative daily water statistics for one meter."""
-    stats = build_statistics(snapshot)
+    """Import cumulative daily water statistics for one meter."""
+    stats = build_statistics(readings)
     if not stats:
         return
     metadata = StatisticMetaData(
         has_mean=False,
         has_sum=True,
-        name=f"{MANUFACTURER} water {snapshot.meter_id}",
+        name=f"{MANUFACTURER} water {meter_id}",
         source=DOMAIN,
-        statistic_id=statistic_id(snapshot.meter_id),
+        statistic_id=statistic_id(meter_id),
         unit_of_measurement=_STATISTIC_UNIT,
     )
     async_add_external_statistics(hass, metadata, stats)

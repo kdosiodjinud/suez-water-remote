@@ -19,7 +19,8 @@ served from sub-domains like `cz-sitr.suezsmartsolutions.com`,
 | `<alarm>` – active | `on`/`off` | — | One per configured alarm; type/email/phone and configured parameter labels in attributes |
 | `<alarm>: <parameter>` | — | — | One per *configured* parameter slot; empty slots are omitted |
 
-A **Refresh now** button is also created per meter to fetch the latest data on demand.
+Two buttons are also created per meter: **Refresh now** (fetch the latest data on
+demand) and **Import history** (re-import the full daily history into statistics).
 
 ### Alarm names
 
@@ -55,6 +56,12 @@ Notes:
 - This needs the `recorder` integration (declared as a dependency).
 - `<meter id>` is your meter number (the part after the last dash in the device
   name / site label).
+
+**Historical backfill.** On setup the integration imports the portal's **full
+daily history** (not just the recent window), so older days show up in the
+Energy dashboard too. You can re-run it any time with the per-meter **Import
+history** button — handy after the portal revises past days. How far back it
+reaches depends on what the portal returns in its "complete period" mode.
 
 The integration **derives everything** (country sub-domain, branch path,
 UI locale) from a single URL you paste in. No country/branch hard-codes.

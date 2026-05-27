@@ -32,7 +32,7 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
-from .statistics import async_update_meter_statistics
+from .statistics import async_import_meter_statistics
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -93,9 +93,33 @@ class SuezWaterCoordinator(DataUpdateCoordinator[SuezData]):
             raise UpdateFailed(f"network error: {err}") from err
         except SuezError as err:
             raise UpdateFailed(f"portal error: {err}") from err
-        # Backfill long-term statistics with the real per-day timestamps so the
+        # Import long-term statistics with the real per-day timestamps so the
         # Energy dashboard attributes consumption to the correct day even when
-        # the portal publishes it late.
+        # the portal publishes it late. This covers the recent polling window;
+        # deeper history is handled by ``async_backfill``.
         for snapshot in results.values():
-            async_update_meter_statistics(self.hass, snapshot)
+            async_import_meter_statistics(
+                self.hass, snapshot.meter_id, snapshot.daily_index
+            )
         return SuezData(meters=results)
+
+    async def async_backfill_meter(self, meter_id: str) -> None:
+        """Import the full daily history for one meter into statistics.
+
+        Fetches the portal's complete daily series (not just the recent
+        window) and imports it; safe to run repeatedly (idempotent upsert).
+        Errors are logged and swallowed so a backfill never breaks the entry.
+        """
+        try:
+            readings = await self._client.async_fetch_daily_index(
+                meter_id, complete=True
+            )
+        except SuezError as err:
+            _LOGGER.warning("statistics backfill failed for %s: %s", meter_id, err)
+            return
+        async_import_meter_statistics(self.hass, meter_id, readings)
+
+    async def async_backfill(self) -> None:
+        """Backfill the full daily history for every configured meter."""
+        for meter_id in self._meter_ids:
+            await self.async_backfill_meter(meter_id)

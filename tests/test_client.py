@@ -130,6 +130,18 @@ def test_derive_base_url_rejects_bad_input(bad_url: str) -> None:
         derive_base_url(bad_url)
 
 
+async def test_index_url_complete_flag_toggles_periode_complete() -> None:
+    client = SuezVhsClient("user", "pass", BASE)
+    try:
+        assert client._index_url("IndexJour").query["PeriodeComplete"] == "false"
+        assert (
+            client._index_url("IndexJour", complete=True).query["PeriodeComplete"]
+            == "true"
+        )
+    finally:
+        await client.close()
+
+
 # --- Login & cookie handling -------------------------------------------------
 
 

@@ -52,6 +52,10 @@ def _stub_homeassistant() -> None:
         SENSOR = "sensor"
         BUTTON = "button"
 
+    class _EntityCategory:
+        CONFIG = "config"
+        DIAGNOSTIC = "diagnostic"
+
     class _ConfigEntryAuthFailed(Exception):
         pass
 
@@ -75,6 +79,11 @@ def _stub_homeassistant() -> None:
             return None
 
         def async_on_unload(self, _: object) -> None:
+            return None
+
+        def async_create_background_task(
+            self, *args: object, **kwargs: object
+        ) -> None:
             return None
 
     class _DataUpdateCoordinator(Generic[_T]):
@@ -125,6 +134,7 @@ def _stub_homeassistant() -> None:
     make("homeassistant")
     make("homeassistant.const", Platform=_Platform,
          CONF_USERNAME="username", CONF_PASSWORD="password",
+         EntityCategory=_EntityCategory,
          UnitOfVolume=types.SimpleNamespace(
              CUBIC_METERS="m³", LITERS="L"))
     make("homeassistant.core", HomeAssistant=object, callback=lambda f: f)
