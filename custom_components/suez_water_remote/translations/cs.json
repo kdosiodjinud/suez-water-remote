@@ -10,7 +10,7 @@
           "password": "Heslo"
         },
         "data_description": {
-          "url": "Příklad: https://cz-sitr.suezsmartsolutions.com/eMIS.SE_VHS-Benesov/Login.aspx",
+          "url": "Vložte celou adresu přihlašovací stránky vašeho portálu. Země, pobočka i jazyk se zjistí automaticky.",
           "username": "Číselný identifikátor uvedený na faktuře za vodné.",
           "password": "Heslo se ukládá do konfigurace Home Assistantu a posílá se jen na váš vlastní portál."
         }

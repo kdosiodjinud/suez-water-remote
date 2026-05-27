@@ -10,7 +10,7 @@
           "password": "Password"
         },
         "data_description": {
-          "url": "Example: https://cz-sitr.suezsmartsolutions.com/eMIS.SE_VHS-Benesov/Login.aspx",
+          "url": "Paste the full address of your portal's login page. Country, branch and language are detected automatically.",
           "username": "The numeric customer ID printed on your water bill.",
           "password": "Kept in Home Assistant's configuration and sent only to your own portal."
         }
