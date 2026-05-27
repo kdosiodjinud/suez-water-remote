@@ -10,14 +10,16 @@ served from sub-domains like `cz-sitr.suezsmartsolutions.com`,
 | Meter total | m³ | `total_increasing` | Live odometer value |
 | Meter total (liters) | L | `total_increasing` | Same value as above, exposed in liters |
 | Last reading | datetime | — | Timestamp of the most recent telemetry |
-| Today consumption | m³ / L | `total` | From the daily consumption table; `None` until the portal publishes today's row (~23:00) |
-| Yesterday consumption | m³ / L | `total` | From the daily consumption table |
+| Today consumption | m³ / L | `total` | Exact-date match in the daily consumption table; `0` (not `unknown`) until the portal publishes today's row (~23:00). `measured_date` / `data_available` attributes tell a measured `0` apart from "no data yet" |
+| Yesterday consumption | m³ / L | `total` | Exact-date match in the daily consumption table; `0` when not yet published. Never mixes another day's value |
 | This / last month consumption | m³ | `total` | From the monthly table |
 | This / last year consumption | m³ | `total` | From the yearly table |
 | Alarm count | — | `measurement` | Number of recent threshold alarms |
 | Latest alarm | datetime | — | When the most recent alarm fired |
-| Alarm `N` active | `on`/`off` | — | One per configured alarm; type/email/phone in attributes |
-| Alarm `N` parameter 1..3 | — | — | Threshold/interval values; localized label in attributes |
+| `<alarm type>` – active | `on`/`off` | — | One per configured alarm; type/email/phone and configured parameter labels in attributes |
+| `<alarm type>: <parameter>` | — | — | One per *configured* parameter slot, named after the portal's own label (e.g. "Mez nadměrné spotřeby"); empty slots are omitted |
+
+A **Refresh now** button is also created per meter to fetch the latest data on demand.
 
 The integration **derives everything** (country sub-domain, branch path,
 UI locale) from a single URL you paste in. No country/branch hard-codes.

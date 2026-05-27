@@ -118,6 +118,9 @@ def test_derive_base_url_strips_page_and_query(user_url: str, expected: str) -> 
     [
         "",
         "ftp://example.com/foo/",
+        # Plain HTTP is rejected: the login POST carries the password and must
+        # not travel in cleartext.
+        "http://cz-sitr.suezsmartsolutions.com/eMIS.SE_VHS-Benesov/",
         "https://only-host.example.com/",
         "not a url",
     ],

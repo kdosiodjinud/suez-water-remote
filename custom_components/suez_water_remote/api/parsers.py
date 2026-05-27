@@ -24,7 +24,7 @@ from datetime import date, datetime, timedelta
 from bs4 import BeautifulSoup, Tag
 
 from .exceptions import SuezParseError
-from .locales import DEFAULT_LOCALE, Locale, detect_locale
+from .locales import DEFAULT_LOCALE, Locale, attr_str, detect_locale
 from .models import (
     AlarmConfig,
     AlarmConfigParameter,
@@ -126,9 +126,9 @@ def extract_hidden_inputs(soup: BeautifulSoup) -> dict[str, str]:
     """Return a name/value mapping for every ``<input type="hidden">``."""
     out: dict[str, str] = {}
     for inp in soup.find_all("input", attrs={"type": "hidden"}):
-        name = inp.get("name")
+        name = attr_str(inp.get("name"))
         if name:
-            out[name] = inp.get("value", "")
+            out[name] = attr_str(inp.get("value"))
     return out
 
 
@@ -136,7 +136,7 @@ def find_login_form_action(soup: BeautifulSoup) -> str:
     form = soup.find("form")
     if form is None:
         raise SuezParseError("login form missing")
-    action = form.get("action") or ""
+    action = attr_str(form.get("action"))
     if not action:
         raise SuezParseError("login form has no action")
     return action
@@ -152,8 +152,8 @@ def find_submit_button(soup: BeautifulSoup) -> tuple[str, str]:
     submit = soup.find("input", attrs={"type": "submit"})
     if submit is None:
         raise SuezParseError("login form has no submit input")
-    name = submit.get("name") or ""
-    value = submit.get("value") or ""
+    name = attr_str(submit.get("name"))
+    value = attr_str(submit.get("value"))
     if not name:
         raise SuezParseError("submit input has no name attribute")
     return name, value

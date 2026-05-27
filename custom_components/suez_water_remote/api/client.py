@@ -109,8 +109,11 @@ def derive_base_url(user_url: str) -> URL:
     if not user_url:
         raise ValueError("portal URL must not be empty")
     parsed = URL(user_url)
-    if parsed.scheme not in ("http", "https"):
-        raise ValueError(f"portal URL must be http(s), got {parsed.scheme!r}")
+    # Require TLS: the login flow POSTs the customer's password, so a plain
+    # ``http://`` URL would expose credentials on the wire. Every real Suez
+    # deployment is served over HTTPS.
+    if parsed.scheme != "https":
+        raise ValueError(f"portal URL must use https, got {parsed.scheme!r}")
     if not parsed.host:
         raise ValueError("portal URL must include a host")
     path = parsed.path or "/"

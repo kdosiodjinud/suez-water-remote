@@ -14,14 +14,13 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import UnitOfVolume
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
 from .api import AlarmConfig, ConsumptionPoint, MeterSnapshot
-from .const import DOMAIN, MANUFACTURER, MODEL
 from .coordinator import SuezConfigEntry, SuezWaterCoordinator
+from .entity import meter_device_info
 
 SensorValue = float | int | str | datetime | None
 
@@ -84,28 +83,50 @@ def _by_day(points: tuple[ConsumptionPoint, ...], target: date) -> float | None:
     return None
 
 
-def _yesterday_consumption(snapshot: MeterSnapshot) -> float | None:
-    # Exact-date lookup: prevents "yesterday" from collapsing onto the same
-    # value as "today" while the portal still serves the previous day's
-    # data (the chart on the home page updates only at ~23:00).
-    return _by_day(snapshot.daily_consumption, date.today() - timedelta(days=1))
+def _yesterday_consumption(snapshot: MeterSnapshot) -> float:
+    # Exact-date lookup against the daily-statistics page: never mixes the
+    # previous day's measured value into a different day. Falls back to 0.0
+    # when the portal has not published yesterday's row yet, so the sensor
+    # always reports a number rather than ``unknown``.
+    value = _by_day(snapshot.daily_consumption, date.today() - timedelta(days=1))
+    return value if value is not None else 0.0
 
 
-def _today_consumption(snapshot: MeterSnapshot) -> float | None:
-    # Until the portal publishes today's row (~23:00 local), this returns
-    # ``None`` rather than falsely echoing yesterday's value from the home
-    # chart. The chart-derived total is intentionally not used.
-    return _by_day(snapshot.daily_consumption, date.today())
+def _today_consumption(snapshot: MeterSnapshot) -> float:
+    # Exact-date lookup against the daily-statistics page. Until the portal
+    # publishes today's row, this reports 0.0 rather than echoing another
+    # day's value — yesterday's measurement is never surfaced as "today".
+    value = _by_day(snapshot.daily_consumption, date.today())
+    return value if value is not None else 0.0
 
 
-def _today_consumption_liters(snapshot: MeterSnapshot) -> float | None:
-    value = _today_consumption(snapshot)
-    return value * _LITERS_PER_M3 if value is not None else None
+def _today_consumption_liters(snapshot: MeterSnapshot) -> float:
+    return _today_consumption(snapshot) * _LITERS_PER_M3
 
 
-def _yesterday_consumption_liters(snapshot: MeterSnapshot) -> float | None:
-    value = _yesterday_consumption(snapshot)
-    return value * _LITERS_PER_M3 if value is not None else None
+def _yesterday_consumption_liters(snapshot: MeterSnapshot) -> float:
+    return _yesterday_consumption(snapshot) * _LITERS_PER_M3
+
+
+def _measured_date_attrs(
+    days_ago: int,
+) -> Callable[[MeterSnapshot], Mapping[str, object]]:
+    """Expose whether the target day actually has a row on the daily page.
+
+    ``days_ago`` is resolved against ``date.today()`` at read time (not at
+    module import). Lets a dashboard distinguish a genuinely measured 0 m³
+    from "no data published yet" — both render as 0 in the state.
+    """
+
+    def fn(snapshot: MeterSnapshot) -> Mapping[str, object]:
+        target = date.today() - timedelta(days=days_ago)
+        present = _by_day(snapshot.daily_consumption, target) is not None
+        return {
+            "measured_date": target.isoformat() if present else None,
+            "data_available": present,
+        }
+
+    return fn
 
 
 def _meter_total_liters(snapshot: MeterSnapshot) -> float:
@@ -158,6 +179,7 @@ SENSORS: tuple[SuezSensorDescription, ...] = (
         native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
         suggested_display_precision=3,
         value_fn=_today_consumption,
+        attrs_fn=_measured_date_attrs(0),
     ),
     SuezSensorDescription(
         key="today_consumption_liters",
@@ -167,6 +189,7 @@ SENSORS: tuple[SuezSensorDescription, ...] = (
         native_unit_of_measurement=UnitOfVolume.LITERS,
         suggested_display_precision=0,
         value_fn=_today_consumption_liters,
+        attrs_fn=_measured_date_attrs(0),
     ),
     SuezSensorDescription(
         key="yesterday_consumption",
@@ -176,6 +199,7 @@ SENSORS: tuple[SuezSensorDescription, ...] = (
         native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
         suggested_display_precision=3,
         value_fn=_yesterday_consumption,
+        attrs_fn=_measured_date_attrs(1),
     ),
     SuezSensorDescription(
         key="yesterday_consumption_liters",
@@ -185,6 +209,7 @@ SENSORS: tuple[SuezSensorDescription, ...] = (
         native_unit_of_measurement=UnitOfVolume.LITERS,
         suggested_display_precision=0,
         value_fn=_yesterday_consumption_liters,
+        attrs_fn=_measured_date_attrs(1),
     ),
     SuezSensorDescription(
         key="this_month_consumption",
@@ -226,12 +251,14 @@ SENSORS: tuple[SuezSensorDescription, ...] = (
         key="alarm_count",
         translation_key="alarm_count",
         state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:bell",
         value_fn=lambda s: len(s.alarms),
     ),
     SuezSensorDescription(
         key="latest_alarm_time",
         translation_key="latest_alarm_time",
         device_class=SensorDeviceClass.TIMESTAMP,
+        icon="mdi:bell-ring",
         value_fn=_latest_alarm_time,
     ),
 )
@@ -264,13 +291,12 @@ def _alarm_active_attrs(
         cfg = _find_alarm_config(snapshot, config_id)
         if cfg is None:
             return None
+        labels = [p.label for p in cfg.parameters if p.is_configured]
         return {
             "alarm_type": cfg.alarm_type,
             "email": cfg.email,
             "phone": cfg.phone,
-            "param_1_label": cfg.parameters[0].label or None,
-            "param_2_label": cfg.parameters[1].label or None,
-            "param_3_label": cfg.parameters[2].label or None,
+            "parameter_labels": labels,
         }
 
     return fn
@@ -287,8 +313,13 @@ def _alarm_param_state(
         if not param.is_configured:
             return None
         # Surface the numeric value when the portal serialised it as a plain
-        # decimal; fall back to the raw text otherwise (rare).
-        return param.value_numeric if param.value_numeric is not None else param.value
+        # decimal (kept numeric so automations can compare it); collapse whole
+        # numbers to int so a threshold shows as "800"/"1", not "800.0"/"1.0".
+        # Fall back to the raw text when the value is not numeric (rare).
+        num = param.value_numeric
+        if num is None:
+            return param.value
+        return int(num) if num.is_integer() else num
 
     return fn
 
@@ -311,45 +342,45 @@ def _alarm_param_attrs(
 def _alarm_sensors_for(config: AlarmConfig) -> tuple[SuezSensorDescription, ...]:
     """Build the per-alarm sensor descriptions.
 
-    Each alarm gets an "active" sensor that exposes the type/email/phone in
-    its attributes plus a sensor per parameter slot. Empty parameter slots
-    return ``None`` so they appear as ``unknown`` rather than disappearing
-    from the device list — HA would otherwise re-register them as new
-    entities the moment the portal user fills the slot in.
+    Each alarm gets one "active" sensor (exposing the type/email/phone in its
+    attributes) plus one sensor for every *configured* parameter slot. Empty
+    slots are skipped entirely so the device list is not cluttered with
+    ``unknown`` placeholders, and entities are named after the portal's own
+    localized labels (e.g. "Mez nadměrné spotřeby") instead of opaque
+    "parameter 1/2/3" — the alarm type and label are carried as translation
+    placeholders. The slot-indexed ``key`` keeps each ``unique_id`` stable
+    even if the user later fills another slot.
     """
     cid = config.config_id
-    return (
+    descriptions: list[SuezSensorDescription] = [
         SuezSensorDescription(
             key=f"alarm_{cid}_active",
             translation_key="alarm_active",
-            translation_placeholders={"config_id": cid},
+            translation_placeholders={"alarm_type": config.alarm_type},
             device_class=SensorDeviceClass.ENUM,
             options=list(_ALARM_ACTIVE_OPTIONS),
+            icon="mdi:bell-alert",
             value_fn=_alarm_active_state(cid),
             attrs_fn=_alarm_active_attrs(cid),
-        ),
-        SuezSensorDescription(
-            key=f"alarm_{cid}_param_1",
-            translation_key="alarm_param_1",
-            translation_placeholders={"config_id": cid},
-            value_fn=_alarm_param_state(cid, 0),
-            attrs_fn=_alarm_param_attrs(cid, 0),
-        ),
-        SuezSensorDescription(
-            key=f"alarm_{cid}_param_2",
-            translation_key="alarm_param_2",
-            translation_placeholders={"config_id": cid},
-            value_fn=_alarm_param_state(cid, 1),
-            attrs_fn=_alarm_param_attrs(cid, 1),
-        ),
-        SuezSensorDescription(
-            key=f"alarm_{cid}_param_3",
-            translation_key="alarm_param_3",
-            translation_placeholders={"config_id": cid},
-            value_fn=_alarm_param_state(cid, 2),
-            attrs_fn=_alarm_param_attrs(cid, 2),
-        ),
-    )
+        )
+    ]
+    for slot, param in enumerate(config.parameters):
+        if not param.is_configured:
+            continue
+        descriptions.append(
+            SuezSensorDescription(
+                key=f"alarm_{cid}_param_{slot + 1}",
+                translation_key="alarm_param",
+                translation_placeholders={
+                    "alarm_type": config.alarm_type,
+                    "param_label": param.label,
+                },
+                icon="mdi:bell-cog",
+                value_fn=_alarm_param_state(cid, slot),
+                attrs_fn=_alarm_param_attrs(cid, slot),
+            )
+        )
+    return tuple(descriptions)
 
 
 async def async_setup_entry(
@@ -394,21 +425,7 @@ class SuezWaterSensor(CoordinatorEntity[SuezWaterCoordinator], SensorEntity):
         self.entity_description = description
         self._meter_id = meter_id
         self._attr_unique_id = f"{meter_id}_{description.key}"
-        # Use the site label rendered by the portal (e.g.
-        # "99999-XX-1234567") as a stable, human-readable device name; fall
-        # back to the meter id alone before the first snapshot lands.
-        device_name = meter_id
-        if coordinator.data is not None:
-            snapshot = coordinator.data.meters.get(meter_id)
-            if snapshot is not None:
-                device_name = snapshot.site_label
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, meter_id)},
-            manufacturer=MANUFACTURER,
-            model=MODEL,
-            name=device_name,
-            configuration_url=str(coordinator.client.base_url),
-        )
+        self._attr_device_info = meter_device_info(coordinator, meter_id)
 
     @callback
     def _snapshot(self) -> MeterSnapshot | None:

@@ -27,6 +27,22 @@ from typing import Final
 from bs4 import BeautifulSoup
 
 
+def attr_str(value: object, default: str = "") -> str:
+    """Coerce a BeautifulSoup attribute value to a single string.
+
+    ``Tag.get`` returns ``str`` for ordinary attributes, a list
+    (``AttributeValueList``) for space-separated multi-valued ones such as
+    ``class``, or ``None`` when the attribute is absent. Every attribute we
+    read here (``name``, ``value``, ``action``, …) is single-valued, but this
+    normalises all three cases so callers always work with a ``str``.
+    """
+    if value is None:
+        return default
+    if isinstance(value, list):
+        return " ".join(str(item) for item in value)
+    return str(value)
+
+
 @dataclass(frozen=True, slots=True)
 class Locale:
     """A user-interface locale supported by the portal."""
@@ -186,12 +202,12 @@ def detect_locale(html: str) -> Locale:
         selected_value: str | None = None
         for option in select.find_all("option"):
             if option.has_attr("selected"):
-                selected_value = option.get("value")
+                selected_value = attr_str(option.get("value")) or None
                 break
         if selected_value is None:
             # Some ASP.NET renderings just set ``value`` on the select element
             # without ``selected`` on any option.
-            selected_value = select.get("value") or None
+            selected_value = attr_str(select.get("value")) or None
         if selected_value and selected_value in LOCALES:
             return LOCALES[selected_value]
 
@@ -201,7 +217,7 @@ def detect_locale(html: str) -> Locale:
         attrs={"name": "ctl00$PHZonePrincipale$HiddenMessageConnexion"},
     )
     if hidden is not None:
-        value = (hidden.get("value") or "").strip()
+        value = attr_str(hidden.get("value")).strip()
         if value:
             locale = _match_login_phrase(value)
             if locale is not None:
@@ -210,7 +226,7 @@ def detect_locale(html: str) -> Locale:
     # Strategy 3: submit-button label
     submit = soup.find("input", attrs={"type": "submit"})
     if submit is not None:
-        label = (submit.get("value") or "").strip()
+        label = attr_str(submit.get("value")).strip()
         if label:
             locale = _SUBMIT_LABELS.get(label.casefold())
             if locale is not None:

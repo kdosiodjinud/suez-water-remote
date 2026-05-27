@@ -12,7 +12,7 @@
         "data_description": {
           "url": "Příklad: https://cz-sitr.suezsmartsolutions.com/eMIS.SE_VHS-Benesov/Login.aspx",
           "username": "Číselný identifikátor uvedený na faktuře za vodné.",
-          "password": "Heslo je v Home Assistantu uložené šifrovaně a nikam dalšímu se neposílá."
+          "password": "Heslo se ukládá do konfigurace Home Assistantu a posílá se jen na váš vlastní portál."
         }
       },
       "meters": {
@@ -84,20 +84,19 @@
         "name": "Poslední alarm"
       },
       "alarm_active": {
-        "name": "Alarm {config_id} aktivní",
+        "name": "{alarm_type} – aktivní",
         "state": {
           "on": "Zapnuto",
           "off": "Vypnuto"
         }
       },
-      "alarm_param_1": {
-        "name": "Alarm {config_id} parametr 1"
-      },
-      "alarm_param_2": {
-        "name": "Alarm {config_id} parametr 2"
-      },
-      "alarm_param_3": {
-        "name": "Alarm {config_id} parametr 3"
+      "alarm_param": {
+        "name": "{alarm_type}: {param_label}"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Načíst aktuální data"
       }
     }
   }

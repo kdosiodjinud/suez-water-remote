@@ -12,7 +12,7 @@
         "data_description": {
           "url": "Example: https://cz-sitr.suezsmartsolutions.com/eMIS.SE_VHS-Benesov/Login.aspx",
           "username": "The numeric customer ID printed on your water bill.",
-          "password": "Stored encrypted in Home Assistant; never transmitted to third parties."
+          "password": "Kept in Home Assistant's configuration and sent only to your own portal."
         }
       },
       "meters": {
@@ -84,20 +84,19 @@
         "name": "Latest alarm"
       },
       "alarm_active": {
-        "name": "Alarm {config_id} active",
+        "name": "{alarm_type} – active",
         "state": {
           "on": "On",
           "off": "Off"
         }
       },
-      "alarm_param_1": {
-        "name": "Alarm {config_id} parameter 1"
-      },
-      "alarm_param_2": {
-        "name": "Alarm {config_id} parameter 2"
-      },
-      "alarm_param_3": {
-        "name": "Alarm {config_id} parameter 3"
+      "alarm_param": {
+        "name": "{alarm_type}: {param_label}"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Refresh now"
       }
     }
   }

@@ -11,5 +11,5 @@
   "loggers": ["custom_components.suez_water_remote"],
   "quality_scale": "silver",
   "requirements": ["beautifulsoup4>=4.12.0"],
-  "version": "0.3.0"
+  "version": "0.3.1"
 }

@@ -49,6 +49,7 @@ def _stub_homeassistant() -> None:
 
     class _Platform:
         SENSOR = "sensor"
+        BUTTON = "button"
 
     class _ConfigEntryAuthFailed(Exception):
         pass
@@ -83,17 +84,48 @@ def _stub_homeassistant() -> None:
             pass
 
     class _CoordinatorEntity(Generic[_T]):
-        pass
+        def __init__(self, coordinator: object | None = None) -> None:
+            self.coordinator = coordinator
 
     class _UpdateFailed(Exception):
         pass
+
+    from dataclasses import dataclass
+
+    @dataclass(frozen=True, kw_only=True)
+    class _SensorEntityDescription:
+        # Permissive shape covering every field the integration sets; mirrors
+        # the real HA dataclass closely enough for the pure value/attr fns and
+        # the per-alarm description builder to be unit-tested without HA.
+        key: str = ""
+        translation_key: str | None = None
+        translation_placeholders: object | None = None
+        name: object | None = None
+        device_class: object | None = None
+        state_class: object | None = None
+        native_unit_of_measurement: object | None = None
+        suggested_display_precision: int | None = None
+        options: object | None = None
+        entity_category: object | None = None
+        icon: str | None = None
+
+    @dataclass(frozen=True, kw_only=True)
+    class _ButtonEntityDescription:
+        key: str = ""
+        translation_key: str | None = None
+        name: object | None = None
+        device_class: object | None = None
+        entity_category: object | None = None
+        icon: str | None = None
 
     def _async_create_clientsession(*args: object, **kwargs: object) -> object:
         raise RuntimeError("stub: HA not available")
 
     make("homeassistant")
     make("homeassistant.const", Platform=_Platform,
-         CONF_USERNAME="username", CONF_PASSWORD="password")
+         CONF_USERNAME="username", CONF_PASSWORD="password",
+         UnitOfVolume=types.SimpleNamespace(
+             CUBIC_METERS="m³", LITERS="L"))
     make("homeassistant.core", HomeAssistant=object, callback=lambda f: f)
     make("homeassistant.exceptions",
          ConfigEntryAuthFailed=_ConfigEntryAuthFailed,
@@ -118,13 +150,17 @@ def _stub_homeassistant() -> None:
          TextSelectorType=types.SimpleNamespace(TEXT="text", PASSWORD="password"))
     make("homeassistant.components")
     make("homeassistant.components.sensor",
-         SensorDeviceClass=types.SimpleNamespace(WATER="water", TIMESTAMP="timestamp"),
+         SensorDeviceClass=types.SimpleNamespace(
+             WATER="water", TIMESTAMP="timestamp", ENUM="enum"),
          SensorEntity=object,
-         SensorEntityDescription=object,
+         SensorEntityDescription=_SensorEntityDescription,
          SensorStateClass=types.SimpleNamespace(
              TOTAL_INCREASING="total_increasing", TOTAL="total",
              MEASUREMENT="measurement",
          ))
+    make("homeassistant.components.button",
+         ButtonEntity=object,
+         ButtonEntityDescription=_ButtonEntityDescription)
     make("homeassistant.components.diagnostics",
          async_redact_data=lambda d, _: d)
     make("homeassistant.util")

@@ -53,7 +53,9 @@ STEP_USER_SCHEMA = vol.Schema(
 )
 
 
-class SuezWaterConfigFlow(ConfigFlow, domain=DOMAIN):
+# ``domain`` is a valid class keyword on the real (typed) ConfigFlow; mypy only
+# flags it because Home Assistant is treated as an untyped import here.
+class SuezWaterConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Two-step flow: URL+credentials → meter selection."""
 
     VERSION = 1
@@ -193,11 +195,11 @@ class SuezWaterConfigFlow(ConfigFlow, domain=DOMAIN):
         client = SuezVhsClient(
             username, password, base_url=base_url, session=session
         )
-        try:
-            await client.async_login()
-            meters = await client.async_discover_meters()
-        finally:
-            ...
+        # The session is created via ``async_create_clientsession`` and is
+        # therefore owned and cleaned up by Home Assistant on shutdown; the
+        # client must not close it here.
+        await client.async_login()
+        meters = await client.async_discover_meters()
         return client.locale.code, meters
 
     def _create_entry(self, meters: tuple[str, ...]) -> ConfigFlowResult:
