@@ -16,6 +16,7 @@ from custom_components.suez_water_remote.api.locales import (
 )
 from custom_components.suez_water_remote.api.parsers import (
     discover_meter_ids,
+    parse_alarm_configs,
     parse_alarms,
     parse_daily_consumption,
     parse_daily_index,
@@ -201,3 +202,39 @@ def test_alarms_table_parsed_in_order() -> None:
     assert first.value == pytest.approx(20.0)
     assert first.email_status == "OK"
     assert first.sms_status is None
+
+
+def test_alarm_config_parses_jqgrid_payload() -> None:
+    """``parse_alarm_configs`` extracts the JSON embedded in the jqGrid init.
+
+    The CZ fixture has a leak alarm (no threshold parameters) and an
+    over-consumption alarm whose two configured parameters carry the
+    threshold (``800``) and the interval (``1`` day) — verifying both the
+    "empty parameter slot" and "numeric coercion" branches.
+    """
+    configs = parse_alarm_configs(fixture("alarms_config.html"), LOCALE_CS)
+    assert len(configs) == 2
+
+    leak, over = configs
+    assert leak.config_id == "0"
+    assert leak.active is True
+    assert leak.email == "alerts@example.com"
+    assert leak.phone is None
+    assert all(not p.is_configured for p in leak.parameters)
+
+    assert over.config_id == "1"
+    assert over.active is True
+    assert over.parameters[0].label == "Mez nadměrné spotřeby"
+    assert over.parameters[0].value_numeric == pytest.approx(800.0)
+    assert over.parameters[1].label == "Počet dnů"
+    assert over.parameters[1].value_numeric == pytest.approx(1.0)
+    assert not over.parameters[2].is_configured
+
+
+def test_alarm_config_empty_when_grid_missing() -> None:
+    """A portal that has no configured alarms still renders a valid page.
+
+    We return an empty tuple rather than raising so the snapshot survives
+    when the grid initialiser script is absent.
+    """
+    assert parse_alarm_configs("<html><body>no script</body></html>") == ()

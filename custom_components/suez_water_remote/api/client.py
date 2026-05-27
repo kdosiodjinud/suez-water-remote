@@ -38,6 +38,7 @@ from .const import (
     AFFICHAGE_CONSO_YEAR,
     AFFICHAGE_INDEX_DAY,
     AFFICHAGE_INDEX_MONTH,
+    ALARMS_CONFIG_PATH,
     ALARMS_PATH,
     AUTH_COOKIE,
     DEFAULT_TIMEOUT_SECONDS,
@@ -63,6 +64,7 @@ from .parsers import (
     extract_hidden_inputs,
     find_login_form_action,
     find_submit_button,
+    parse_alarm_configs,
     parse_alarms,
     parse_daily_consumption,
     parse_daily_index,
@@ -309,6 +311,7 @@ class SuezVhsClient:
             monthly_idx_html,
             daily_idx_html,
             alarms_html,
+            alarms_config_html,
         ) = await asyncio.gather(
             self._fetch_html(self._energy_url(AFFICHAGE_CONSO_MONTH)),
             self._fetch_html(self._energy_url(AFFICHAGE_CONSO_YEAR)),
@@ -316,6 +319,7 @@ class SuezVhsClient:
             self._fetch_html(self._index_url(AFFICHAGE_INDEX_MONTH)),
             self._fetch_html(self._index_url(AFFICHAGE_INDEX_DAY)),
             self._fetch_html(self._url(ALARMS_PATH)),
+            self._fetch_html(self._url(ALARMS_CONFIG_PATH)),
         )
 
         return MeterSnapshot(
@@ -329,6 +333,7 @@ class SuezVhsClient:
             monthly_index=parse_monthly_index(monthly_idx_html, meter, self._locale),
             daily_index=parse_daily_index(daily_idx_html, meter, self._locale),
             alarms=parse_alarms(alarms_html, self._locale),
+            alarm_configs=parse_alarm_configs(alarms_config_html, self._locale),
         )
 
     # -- private helpers -----------------------------------------------------

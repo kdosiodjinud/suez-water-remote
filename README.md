@@ -8,13 +8,16 @@ served from sub-domains like `cz-sitr.suezsmartsolutions.com`,
 | Sensor | Unit | State class | Notes |
 | --- | --- | --- | --- |
 | Meter total | m³ | `total_increasing` | Live odometer value |
+| Meter total (liters) | L | `total_increasing` | Same value as above, exposed in liters |
 | Last reading | datetime | — | Timestamp of the most recent telemetry |
-| Today consumption | m³ | `total` | Derived from hourly chart on the home page |
-| Yesterday consumption | m³ | `total` | From the daily consumption table |
+| Today consumption | m³ / L | `total` | From the daily consumption table; `None` until the portal publishes today's row (~23:00) |
+| Yesterday consumption | m³ / L | `total` | From the daily consumption table |
 | This / last month consumption | m³ | `total` | From the monthly table |
 | This / last year consumption | m³ | `total` | From the yearly table |
 | Alarm count | — | `measurement` | Number of recent threshold alarms |
 | Latest alarm | datetime | — | When the most recent alarm fired |
+| Alarm `N` active | `on`/`off` | — | One per configured alarm; type/email/phone in attributes |
+| Alarm `N` parameter 1..3 | — | — | Threshold/interval values; localized label in attributes |
 
 The integration **derives everything** (country sub-domain, branch path,
 UI locale) from a single URL you paste in. No country/branch hard-codes.

@@ -47,14 +47,23 @@
       "meter_total": {
         "name": "Meter total"
       },
+      "meter_total_liters": {
+        "name": "Meter total (liters)"
+      },
       "last_reading_time": {
         "name": "Last reading"
       },
       "today_consumption": {
         "name": "Today consumption"
       },
+      "today_consumption_liters": {
+        "name": "Today consumption (liters)"
+      },
       "yesterday_consumption": {
         "name": "Yesterday consumption"
+      },
+      "yesterday_consumption_liters": {
+        "name": "Yesterday consumption (liters)"
       },
       "this_month_consumption": {
         "name": "This month consumption"
@@ -73,6 +82,22 @@
       },
       "latest_alarm_time": {
         "name": "Latest alarm"
+      },
+      "alarm_active": {
+        "name": "Alarm {config_id} active",
+        "state": {
+          "on": "On",
+          "off": "Off"
+        }
+      },
+      "alarm_param_1": {
+        "name": "Alarm {config_id} parameter 1"
+      },
+      "alarm_param_2": {
+        "name": "Alarm {config_id} parameter 2"
+      },
+      "alarm_param_3": {
+        "name": "Alarm {config_id} parameter 3"
       }
     }
   }

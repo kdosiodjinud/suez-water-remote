@@ -9,6 +9,7 @@ LOGIN_PATH: Final = "Login.aspx"
 HOME_PATH: Final = "Site.aspx"
 ENERGY_PATH: Final = "Site_Energie.aspx"
 ALARMS_PATH: Final = "Site_AlarmesClient.aspx"
+ALARMS_CONFIG_PATH: Final = "Site_ConfigurationAlarmeClient.aspx"
 
 # ASP.NET WebForms field names. ``ctl00`` is the master page, ``PHZonePrincipale``
 # is the content placeholder. These identifiers are language-independent.

@@ -18,6 +18,8 @@ from .locales import (
     detect_locale,
 )
 from .models import (
+    AlarmConfig,
+    AlarmConfigParameter,
     AlarmEntry,
     ConsumptionPoint,
     MeterReading,
@@ -31,6 +33,8 @@ __all__ = [
     "LOCALE_DE",
     "LOCALE_EN",
     "LOCALE_FR",
+    "AlarmConfig",
+    "AlarmConfigParameter",
     "AlarmEntry",
     "ConsumptionPoint",
     "Locale",

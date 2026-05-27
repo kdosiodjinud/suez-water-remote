@@ -16,6 +16,7 @@ classes) rather than localised text labels.
 from __future__ import annotations
 
 import calendar
+import json
 import re
 from collections.abc import Iterable
 from datetime import date, datetime, timedelta
@@ -24,7 +25,13 @@ from bs4 import BeautifulSoup, Tag
 
 from .exceptions import SuezParseError
 from .locales import DEFAULT_LOCALE, Locale, detect_locale
-from .models import AlarmEntry, ConsumptionPoint, MeterReading
+from .models import (
+    AlarmConfig,
+    AlarmConfigParameter,
+    AlarmEntry,
+    ConsumptionPoint,
+    MeterReading,
+)
 
 # --- Generic helpers ---------------------------------------------------------
 
@@ -459,6 +466,129 @@ def parse_alarms(
             )
         )
     return tuple(alarms)
+
+
+# --- Alarm configuration -----------------------------------------------------
+
+# The configuration page renders a jqGrid initialiser of the form
+# ``var paramsctl00_..._GridViewAlarmes={...,data:{"rows":[...],...},...};``.
+# The ``data:`` value is well-formed JSON; the surrounding object is not (the
+# keys are unquoted JavaScript identifiers), so we locate ``data:`` then
+# extract a balanced ``{...}`` block via a manual brace scan rather than
+# trying to evaluate the entire script.
+_ALARM_CONFIG_DATA_RE = re.compile(
+    r"paramsctl00_[A-Za-z0-9_]*GridViewAlarmes\s*=\s*\{[^=]*?data\s*:\s*(?=\{)",
+    re.IGNORECASE,
+)
+
+
+def _extract_balanced_object(text: str, start: int) -> str | None:
+    """Return the JSON object literal that begins at ``text[start] == '{'``.
+
+    Honours string literals (single and double quoted) so that braces inside
+    strings do not unbalance the count.
+    """
+    if start >= len(text) or text[start] != "{":
+        return None
+    depth = 0
+    i = start
+    in_string = False
+    string_char = ""
+    while i < len(text):
+        ch = text[i]
+        if in_string:
+            if ch == "\\" and i + 1 < len(text):
+                i += 2
+                continue
+            if ch == string_char:
+                in_string = False
+        elif ch in ('"', "'"):
+            in_string = True
+            string_char = ch
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start : i + 1]
+        i += 1
+    return None
+
+
+def _coerce_numeric(raw: str, locale: Locale) -> float | None:
+    """Best-effort numeric coercion of an alarm parameter value.
+
+    The portal serialises parameters as plain integers (``"800"``,
+    ``"1"``) on every locale we have seen — no thousands separator and no
+    fractional part — but we still try a locale-aware parse first so a
+    future ``"3,5"`` would round-trip correctly. Returns ``None`` when the
+    value is empty or non-numeric so callers can distinguish "no threshold"
+    from "threshold 0".
+    """
+    stripped = raw.strip()
+    if not stripped:
+        return None
+    try:
+        return parse_decimal(stripped, locale)
+    except SuezParseError:
+        return None
+
+
+def parse_alarm_configs(
+    html: str, locale: Locale = DEFAULT_LOCALE
+) -> tuple[AlarmConfig, ...]:
+    """Parse configured alarms from ``Site_ConfigurationAlarmeClient.aspx``.
+
+    Returns an empty tuple when the script block (and therefore the data
+    grid) is missing — that is the documented "no alarms configured"
+    rendering and must not blow up the snapshot.
+    """
+    match = _ALARM_CONFIG_DATA_RE.search(html)
+    if match is None:
+        return ()
+    raw = _extract_balanced_object(html, match.end())
+    if raw is None:
+        raise SuezParseError("alarm config data block has unbalanced braces")
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError as err:
+        raise SuezParseError(f"alarm config JSON is malformed: {err.msg}") from err
+    rows = payload.get("rows")
+    if not isinstance(rows, list):
+        return ()
+
+    configs: list[AlarmConfig] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        params = (
+            _parse_alarm_param(row, "Parametre1", locale),
+            _parse_alarm_param(row, "Parametre2", locale),
+            _parse_alarm_param(row, "Parametre3", locale),
+        )
+        configs.append(
+            AlarmConfig(
+                config_id=str(row.get("id", len(configs))),
+                alarm_type=str(row.get("Libelle", "")),
+                active=str(row.get("Active", "")).lower() == "true",
+                email=(row.get("Email") or "").strip() or None,
+                phone=(row.get("Telephone") or "").strip() or None,
+                parameters=params,
+            )
+        )
+    return tuple(configs)
+
+
+def _parse_alarm_param(
+    row: dict[str, object], prefix: str, locale: Locale
+) -> AlarmConfigParameter:
+    label = str(row.get(f"{prefix}.Libelle", "")).strip()
+    value = str(row.get(f"{prefix}.Valeur", "")).strip()
+    return AlarmConfigParameter(
+        label=label,
+        value=value,
+        value_numeric=_coerce_numeric(value, locale),
+    )
 
 
 # --- Meter discovery ---------------------------------------------------------

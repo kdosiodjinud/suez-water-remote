@@ -73,6 +73,11 @@ def _register_data_pages(m: aioresponses, base: str = BASE) -> None:
             body=fixture(fname),
         )
     m.get(f"{base}Site_AlarmesClient.aspx", status=200, body=fixture("alarms.html"))
+    m.get(
+        f"{base}Site_ConfigurationAlarmeClient.aspx",
+        status=200,
+        body=fixture("alarms_config.html"),
+    )
 
 
 # --- derive_base_url --------------------------------------------------------
@@ -216,6 +221,10 @@ async def test_fetch_snapshot_after_manual_cookie_injection() -> None:
     assert len(snap.monthly_index) == 19
     assert len(snap.daily_index) == 24
     assert len(snap.alarms) == 7
+    # The alarm-config endpoint is parsed alongside the alarm history;
+    # both portals we test against expose two configured rows.
+    assert len(snap.alarm_configs) == 2
+    assert snap.alarm_configs[1].parameters[0].value_numeric == pytest.approx(800.0)
 
 
 async def test_client_works_with_alternate_base_url() -> None:
