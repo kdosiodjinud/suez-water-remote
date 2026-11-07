@@ -42,6 +42,20 @@
       "reauth_successful": "Re-authentication succeeded."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Water price",
+        "description": "Optional. With a price set, the integration also publishes a cost statistic (Suez Smart Solutions water cost <meter>) that you can pick as the cost source of the water statistic in the Energy dashboard. Press Import history after changing the price to recompute past days.",
+        "data": {
+          "price_per_m3": "Price per m³"
+        },
+        "data_description": {
+          "price_per_m3": "Water and sewage price per cubic meter, in your Home Assistant currency."
+        }
+      }
+    }
+  },
   "entity": {
     "sensor": {
       "meter_total": {

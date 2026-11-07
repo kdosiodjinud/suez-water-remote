@@ -42,6 +42,20 @@
       "reauth_successful": "Opětovné přihlášení proběhlo úspěšně."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Cena vody",
+        "description": "Volitelné. Se zadanou cenou integrace publikuje i statistiku nákladů (Suez Smart Solutions water cost <vodoměr>), kterou v Energy dashboardu vyberete jako zdroj nákladů statistiky vody. Po změně ceny stiskněte Importovat historii, aby se přepočítaly minulé dny.",
+        "data": {
+          "price_per_m3": "Cena za m³"
+        },
+        "data_description": {
+          "price_per_m3": "Cena vodného a stočného za metr krychlový v měně Home Assistantu."
+        }
+      }
+    }
+  },
   "entity": {
     "sensor": {
       "meter_total": {

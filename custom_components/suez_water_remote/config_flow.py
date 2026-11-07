@@ -9,12 +9,18 @@ from typing import Any
 import voluptuous as vol
 from aiohttp import CookieJar
 from homeassistant.config_entries import (
+    ConfigEntry,
     ConfigFlow,
     ConfigFlowResult,
+    OptionsFlow,
 )
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.selector import (
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
@@ -30,7 +36,14 @@ from .api import (
     SuezVhsClient,
     derive_base_url,
 )
-from .const import CONF_BASE_URL, CONF_LOCALE, CONF_METERS, CONF_URL, DOMAIN
+from .const import (
+    CONF_BASE_URL,
+    CONF_LOCALE,
+    CONF_METERS,
+    CONF_PRICE_PER_M3,
+    CONF_URL,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -52,6 +65,14 @@ STEP_USER_SCHEMA = vol.Schema(
     }
 )
 
+OPTIONS_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_PRICE_PER_M3): NumberSelector(
+            NumberSelectorConfig(min=0, step=0.001, mode=NumberSelectorMode.BOX)
+        ),
+    }
+)
+
 
 # ``domain`` is a valid class keyword on the real (typed) ConfigFlow; mypy only
 # flags it because Home Assistant is treated as an untyped import here.
@@ -59,6 +80,12 @@ class SuezWaterConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Two-step flow: URL+credentials → meter selection."""
 
     VERSION = 2
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> SuezWaterOptionsFlow:
+        """Return the options flow (water price)."""
+        return SuezWaterOptionsFlow()
 
     def __init__(self) -> None:
         self._collected: dict[str, Any] = {}
@@ -223,4 +250,20 @@ class SuezWaterConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
                     )
                 ),
             }
+        )
+
+
+class SuezWaterOptionsFlow(OptionsFlow):
+    """Optional water price; with it set, a cost statistic is published too."""
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+        return self.async_show_form(
+            step_id="init",
+            data_schema=self.add_suggested_values_to_schema(
+                OPTIONS_SCHEMA, self.config_entry.options
+            ),
         )

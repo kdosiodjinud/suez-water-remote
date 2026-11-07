@@ -18,6 +18,7 @@ from custom_components.suez_water_remote import statistics
 from custom_components.suez_water_remote.api import ConsumptionPoint
 
 STAT_ID = "suez_water_remote:water_1234567"
+COST_ID = "suez_water_remote:water_cost_1234567"
 NOW = datetime(2026, 11, 7, 12, 0, tzinfo=UTC)
 
 
@@ -25,15 +26,20 @@ def _point(day: date, value: float) -> ConsumptionPoint:
     return ConsumptionPoint(period_start=day, period_end=day, value_m3=value)
 
 
-def test_build_statistics_cumulative_sorted_and_deduplicated() -> None:
-    stats = statistics.build_statistics(
+def test_daily_values_later_point_wins() -> None:
+    values = statistics.daily_values(
         (
             _point(date(2026, 11, 2), 0.264),
             _point(date(2026, 11, 1), 0.126),  # partial value, revised below
             _point(date(2026, 11, 1), 0.586),
-        ),
-        base_sum=10.0,
-        now=NOW,
+        )
+    )
+    assert values == {date(2026, 11, 1): 0.586, date(2026, 11, 2): 0.264}
+
+
+def test_build_statistics_cumulative_and_sorted() -> None:
+    stats = statistics.build_statistics(
+        {date(2026, 11, 2): 0.264, date(2026, 11, 1): 0.586}, base_sum=10.0, now=NOW
     )
     assert [s["start"] for s in stats] == [
         datetime(2026, 11, 1, 23, tzinfo=UTC),
@@ -45,17 +51,18 @@ def test_build_statistics_cumulative_sorted_and_deduplicated() -> None:
 
 def test_build_statistics_skips_day_still_in_progress() -> None:
     stats = statistics.build_statistics(
-        (_point(date(2026, 11, 6), 0.339), _point(date(2026, 11, 7), 0.1)), 0.0, NOW
+        {date(2026, 11, 6): 0.339, date(2026, 11, 7): 0.1}, 0.0, NOW
     )
     assert [s["sum"] for s in stats] == [0.339]
 
 
 def test_build_statistics_empty() -> None:
-    assert statistics.build_statistics((), 0.0, NOW) == []
+    assert statistics.build_statistics({}, 0.0, NOW) == []
 
 
 def test_statistic_id_format() -> None:
     assert statistics.statistic_id("1234567") == STAT_ID
+    assert statistics.cost_statistic_id("1234567") == COST_ID
 
 
 async def test_import_continues_from_last_stored_sum() -> None:
@@ -98,6 +105,21 @@ async def test_import_starts_from_zero_without_history() -> None:
     assert [s["sum"] for s in stats] == [0.5]
 
 
+async def test_import_with_price_adds_cost_statistic() -> None:
+    add: Mock = async_add_external_statistics
+    add.reset_mock()
+    hass = SimpleNamespace(config=SimpleNamespace(currency="CZK"))
+    await statistics.async_import_meter_statistics(
+        hass, "1234567", (_point(date(2026, 11, 1), 0.5),), price_per_m3=134.7
+    )
+    assert add.call_count == 2
+    _hass, metadata, stats = add.call_args_list[1].args
+    assert metadata["statistic_id"] == COST_ID
+    assert metadata["unit_of_measurement"] == "CZK"
+    assert metadata["has_sum"] is True
+    assert [s["sum"] for s in stats] == [67.35]
+
+
 async def test_import_noop_when_empty() -> None:
     add: Mock = async_add_external_statistics
     add.reset_mock()
@@ -110,7 +132,7 @@ async def test_clear_meter_statistics_waits_for_recorder() -> None:
     recorder = get_instance(hass)
     recorder.cleared.clear()
     await statistics.async_clear_meter_statistics(hass, ["1234567"])
-    assert recorder.cleared == [[STAT_ID]]
+    assert recorder.cleared == [[STAT_ID, COST_ID]]
 
 
 def test_day_start_is_last_hour_of_day() -> None:

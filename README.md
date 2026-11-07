@@ -52,6 +52,16 @@ To add water to the Energy dashboard:
 > daily usage onto the wrong day. The external statistic above is the one that
 > attributes each day's consumption to its correct date.
 
+**Water cost.** The Energy dashboard cannot apply a fixed price to an external
+statistic. Instead, set your price per m³ (water + sewage, in your Home
+Assistant currency) in the integration's options (**Settings → Devices &
+Services → Suez Smart Solutions Water → Configure**). The integration then
+publishes a second statistic, **`Suez Smart Solutions water cost <meter id>`**
+(id `suez_water_remote:water_cost_<meter id>`), which you pick in the water
+source's cost setting (*Use a statistic that tracks the total cost*). Past days
+are priced at the current price; after changing it, press **Import history** to
+recompute them.
+
 Notes:
 
 - The statistic only appears **after the first successful refresh** following

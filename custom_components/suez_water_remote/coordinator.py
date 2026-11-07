@@ -31,6 +31,7 @@ from .const import (
     CONF_BASE_URL,
     CONF_LOCALE,
     CONF_METERS,
+    CONF_PRICE_PER_M3,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
@@ -75,6 +76,7 @@ class SuezWaterCoordinator(DataUpdateCoordinator[SuezData]):
             session=session,
         )
         self._meter_ids: tuple[str, ...] = tuple(entry.data[CONF_METERS])
+        self._price_per_m3: float | None = entry.options.get(CONF_PRICE_PER_M3)
 
     @property
     def meter_ids(self) -> tuple[str, ...]:
@@ -104,7 +106,7 @@ class SuezWaterCoordinator(DataUpdateCoordinator[SuezData]):
         # previous month; deeper history is handled by ``async_backfill``.
         for snapshot in results.values():
             await async_import_meter_statistics(
-                self.hass, snapshot.meter_id, snapshot.daily_consumption
+                self.hass, snapshot.meter_id, snapshot.daily_consumption, self._price_per_m3
             )
         return SuezData(meters=results)
 
@@ -123,7 +125,7 @@ class SuezWaterCoordinator(DataUpdateCoordinator[SuezData]):
         except SuezError as err:
             _LOGGER.warning("statistics backfill failed for %s: %s", meter_id, err)
             return
-        await async_import_meter_statistics(self.hass, meter_id, points)
+        await async_import_meter_statistics(self.hass, meter_id, points, self._price_per_m3)
 
     async def async_backfill(self) -> None:
         """Backfill the full daily history for every configured meter."""

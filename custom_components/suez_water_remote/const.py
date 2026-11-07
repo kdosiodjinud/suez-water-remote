@@ -18,6 +18,9 @@ CONF_LOCALE: Final = "locale"
 
 CONF_METERS: Final = "meters"
 
+CONF_PRICE_PER_M3: Final = "price_per_m3"
+"""Option: water price per m³ (water + sewage); enables the cost statistic."""
+
 # Polling cadence: the upstream telemetry refreshes once per day at 23:00; a
 # short interval would just waste API calls. Every 6 hours is enough to
 # surface new data within hours of release.

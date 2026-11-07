@@ -142,7 +142,7 @@ def _stub_homeassistant() -> None:
          ConfigEntryAuthFailed=_ConfigEntryAuthFailed,
          ConfigEntryNotReady=_ConfigEntryNotReady)
     make("homeassistant.config_entries", ConfigEntry=_ConfigEntry,
-         ConfigFlow=object, ConfigFlowResult=dict)
+         ConfigFlow=object, ConfigFlowResult=dict, OptionsFlow=object)
     make("homeassistant.helpers")
     make("homeassistant.helpers.aiohttp_client",
          async_create_clientsession=_async_create_clientsession,
@@ -155,6 +155,8 @@ def _stub_homeassistant() -> None:
     make("homeassistant.helpers.entity_platform",
          AddConfigEntryEntitiesCallback=object)
     make("homeassistant.helpers.selector",
+         NumberSelector=object, NumberSelectorConfig=object,
+         NumberSelectorMode=types.SimpleNamespace(BOX="box"),
          SelectSelector=object, SelectSelectorConfig=object,
          SelectSelectorMode=types.SimpleNamespace(LIST="list"),
          TextSelector=object, TextSelectorConfig=object,
