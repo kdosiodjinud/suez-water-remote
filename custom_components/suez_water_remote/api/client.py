@@ -21,8 +21,9 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterable
 from contextlib import asynccontextmanager
+from datetime import date, timedelta
 from http.cookies import SimpleCookie
 from types import TracebackType
 from typing import Final, Self
@@ -36,11 +37,11 @@ from .const import (
     AFFICHAGE_CONSO_DAY,
     AFFICHAGE_CONSO_MONTH,
     AFFICHAGE_CONSO_YEAR,
-    AFFICHAGE_INDEX_DAY,
     AFFICHAGE_INDEX_MONTH,
     ALARMS_CONFIG_PATH,
     ALARMS_PATH,
     AUTH_COOKIE,
+    CULTURE_COOKIE,
     DEFAULT_TIMEOUT_SECONDS,
     ENERGY_PATH,
     FIELD_LANGUAGE,
@@ -58,7 +59,7 @@ from .exceptions import (
     SuezParseError,
 )
 from .locales import DEFAULT_LOCALE, Locale, detect_locale
-from .models import MeterReading, MeterSnapshot
+from .models import ConsumptionPoint, MeterSnapshot
 from .parsers import (
     discover_meter_ids,
     extract_hidden_inputs,
@@ -66,8 +67,8 @@ from .parsers import (
     find_submit_button,
     parse_alarm_configs,
     parse_alarms,
+    parse_available_months,
     parse_daily_consumption,
-    parse_daily_index,
     parse_home_page,
     parse_monthly_consumption,
     parse_monthly_index,
@@ -127,6 +128,25 @@ def derive_base_url(user_url: str) -> URL:
             "(e.g. '.../eMIS.SE_<branch>/')"
         )
     return parsed.with_path(path).with_query(None).with_fragment(None)
+
+
+def recent_months(today: date) -> tuple[date, date]:
+    """Return the first days of the previous and the current month of ``today``."""
+    current = today.replace(day=1)
+    previous = (current - timedelta(days=1)).replace(day=1)
+    return previous, current
+
+
+def merge_daily(
+    batches: Iterable[Iterable[ConsumptionPoint]],
+) -> tuple[ConsumptionPoint, ...]:
+    """Merge daily points from several pages into one series, one point per day.
+
+    Later batches win, so a month fetched again (with revised, now complete
+    days) overrides what an earlier page said.
+    """
+    by_day = {point.period_start: point for batch in batches for point in batch}
+    return tuple(by_day[day] for day in sorted(by_day))
 
 
 class SuezVhsClient:
@@ -287,8 +307,15 @@ class SuezVhsClient:
             raise SuezParseError("no meters were discovered on the home page")
         return meters
 
-    async def async_fetch_snapshot(self, meter_id: str | None = None) -> MeterSnapshot:
-        """Fetch the full dataset for ``meter_id`` (or the single account meter)."""
+    async def async_fetch_snapshot(
+        self, meter_id: str | None = None, *, today: date | None = None
+    ) -> MeterSnapshot:
+        """Fetch the full dataset for ``meter_id`` (or the single account meter).
+
+        The daily consumption covers the current and the previous month, so a
+        day the portal publishes late is picked up even across a month
+        boundary. ``today`` defaults to the local date.
+        """
         await self._ensure_logged_in()
         home_html = await self._fetch_authenticated_html(self._url(HOME_PATH))
         site_label, discovered_meter, current, today_total = parse_home_page(
@@ -307,22 +334,21 @@ class SuezVhsClient:
             value_m3=current.value_m3,
         )
 
+        months = recent_months(today or date.today())
         (
             monthly_html,
             yearly_html,
-            daily_html,
             monthly_idx_html,
-            daily_idx_html,
             alarms_html,
             alarms_config_html,
+            *daily_htmls,
         ) = await asyncio.gather(
             self._fetch_html(self._energy_url(AFFICHAGE_CONSO_MONTH)),
             self._fetch_html(self._energy_url(AFFICHAGE_CONSO_YEAR)),
-            self._fetch_html(self._energy_url(AFFICHAGE_CONSO_DAY)),
             self._fetch_html(self._index_url(AFFICHAGE_INDEX_MONTH)),
-            self._fetch_html(self._index_url(AFFICHAGE_INDEX_DAY)),
             self._fetch_html(self._url(ALARMS_PATH)),
             self._fetch_html(self._url(ALARMS_CONFIG_PATH)),
+            *(self._fetch_html(self._daily_url(month)) for month in months),
         )
 
         return MeterSnapshot(
@@ -332,31 +358,37 @@ class SuezVhsClient:
             today_total_liters=today_total,
             monthly_consumption=parse_monthly_consumption(monthly_html, self._locale),
             yearly_consumption=parse_yearly_consumption(yearly_html, self._locale),
-            daily_consumption=parse_daily_consumption(daily_html, self._locale),
+            daily_consumption=merge_daily(self._parse_daily(html) for html in daily_htmls),
             monthly_index=parse_monthly_index(monthly_idx_html, meter, self._locale),
-            daily_index=parse_daily_index(daily_idx_html, meter, self._locale),
             alarms=parse_alarms(alarms_html, self._locale),
             alarm_configs=parse_alarm_configs(alarms_config_html, self._locale),
         )
 
-    async def async_fetch_daily_index(
-        self, meter_id: str, *, complete: bool = True
-    ) -> tuple[MeterReading, ...]:
-        """Fetch the per-day cumulative meter readings.
+    async def async_fetch_daily_consumption(
+        self, month: date
+    ) -> tuple[ConsumptionPoint, ...]:
+        """Fetch the daily consumption table of the month containing ``month``.
 
-        With ``complete=True`` the portal returns the full daily history
-        (``PeriodeComplete``), used for the one-time statistics backfill.
-        Returns an empty tuple when the table is absent so a backfill can
-        never bring the integration down.
+        Returns an empty tuple when the portal has no table for that month, so
+        a history backfill can never bring the integration down.
         """
         await self._ensure_logged_in()
+        html = await self._fetch_authenticated_html(self._daily_url(month))
+        return self._parse_daily(html)
+
+    async def async_fetch_available_months(self) -> tuple[date, ...]:
+        """Return the months the portal serves daily tables for, oldest first."""
+        await self._ensure_logged_in()
         html = await self._fetch_authenticated_html(
-            self._index_url(AFFICHAGE_INDEX_DAY, complete=complete)
+            self._energy_url(AFFICHAGE_CONSO_DAY)
         )
+        return parse_available_months(html, self._locale)
+
+    def _parse_daily(self, html: str) -> tuple[ConsumptionPoint, ...]:
         try:
-            return parse_daily_index(html, meter_id, self._locale)
+            return parse_daily_consumption(html, self._locale)
         except SuezParseError:
-            _LOGGER.debug("daily index table missing for meter %s", meter_id)
+            _LOGGER.debug("daily consumption table missing or empty")
             return ()
 
     # -- private helpers -----------------------------------------------------
@@ -376,19 +408,44 @@ class SuezVhsClient:
     def _energy_url(self, affichage: str) -> URL:
         return self._url(ENERGY_PATH).with_query({"Affichage": affichage})
 
-    def _index_url(self, affichage: str, *, complete: bool = False) -> URL:
-        # ``PeriodeComplete=true`` makes the portal return the full daily
-        # series instead of just the recent window — used for the one-time
-        # history backfill.
+    def _daily_url(self, month: date) -> URL:
+        # ``Annee``/``Mois`` pick the month the daily table shows; without
+        # them the portal serves the current month only.
+        return self._url(ENERGY_PATH).with_query(
+            {
+                "Affichage": AFFICHAGE_CONSO_DAY,
+                "Annee": str(month.year),
+                "Mois": str(month.month),
+            }
+        )
+
+    def _index_url(self, affichage: str) -> URL:
         return self._url(ENERGY_PATH).with_query(
             {
                 "Affichage": affichage,
                 "IndexesSepares": "true",
-                "PeriodeComplete": "true" if complete else "false",
+                "PeriodeComplete": "false",
             }
         )
 
     async def _login_locked(self) -> None:
+        # The portal treats a login POST whose language field differs from the
+        # culture the form was rendered in as a language switch: it sets the
+        # ``Culture`` cookie and bounces back to the form without logging in.
+        # Pin the culture up front when the caller chose the locale, and retry
+        # the form once in case the portal ignored the cookie.
+        if self._locale_locked:
+            self._session.cookie_jar.update_cookies(
+                {CULTURE_COOKIE: self._locale.code}, self._base_url
+            )
+        for attempt in (1, 2):
+            if await self._submit_login_form():
+                self._logged_in = True
+                return
+            _LOGGER.debug("login attempt %d yielded no auth cookie", attempt)
+        raise SuezAuthenticationError("Suez portal rejected the credentials")
+
+    async def _submit_login_form(self) -> bool:
         # Hit a protected page so the portal redirects to a login URL whose
         # form action carries a ReturnUrl. We re-submit the form with the
         # exact submit button value the server rendered, so the request
@@ -435,16 +492,13 @@ class SuezVhsClient:
                 timeout=self._timeout,
                 allow_redirects=False,
             ) as resp:
-                text = await resp.text()
+                await resp.text()
                 self._ingest_set_cookie(resp.headers.getall("Set-Cookie", []))
         except (aiohttp.ClientError, TimeoutError) as err:
             raise SuezConnectionError(
                 f"network error during login: {err.__class__.__name__}"
             ) from err
-        if not self._has_auth_cookie():
-            _LOGGER.debug("login failed; portal response size=%d", len(text))
-            raise SuezAuthenticationError("Suez portal rejected the credentials")
-        self._logged_in = True
+        return self._has_auth_cookie()
 
     def _ingest_set_cookie(self, raw_headers: list[str]) -> None:
         """Parse ``Set-Cookie`` headers individually and push them to the jar.
@@ -549,4 +603,4 @@ class SuezVhsClient:
             raise
 
 
-__all__ = ["SuezVhsClient", "derive_base_url"]
+__all__ = ["SuezVhsClient", "derive_base_url", "merge_daily", "recent_months"]

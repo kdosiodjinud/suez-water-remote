@@ -18,8 +18,8 @@ from custom_components.suez_water_remote.api.parsers import (
     discover_meter_ids,
     parse_alarm_configs,
     parse_alarms,
+    parse_available_months,
     parse_daily_consumption,
-    parse_daily_index,
     parse_decimal,
     parse_home_page,
     parse_localized_date,
@@ -180,17 +180,40 @@ def test_daily_consumption_last_row_is_today() -> None:
     assert last.value_m3 == pytest.approx(3.789)
 
 
+def test_daily_consumption_liters_table_is_converted_to_m3() -> None:
+    # Months whose days all stay below 1 m³ are served in liters.
+    points = parse_daily_consumption(fixture("conso_jour_liters.html"), LOCALE_CS)
+    assert len(points) == 31
+    assert points[0].period_start == date(2026, 10, 1)
+    assert points[0].value_m3 == pytest.approx(0.451)
+    assert points[-1].value_m3 == pytest.approx(0.480)
+
+
+def test_daily_consumption_en_liters() -> None:
+    points = parse_daily_consumption(fixture("conso_jour_en.html"), LOCALE_EN)
+    assert [p.period_start for p in points[:2]] == [date(2026, 11, 1), date(2026, 11, 2)]
+    assert points[0].value_m3 == pytest.approx(0.586)
+
+
+@pytest.mark.parametrize(
+    "fname,locale",
+    [("conso_jour_liters.html", LOCALE_CS), ("conso_jour_en.html", LOCALE_EN)],
+)
+def test_available_months_from_selector(fname: str, locale) -> None:
+    months = parse_available_months(fixture(fname), locale)
+    assert len(months) == 24
+    assert months[0] == date(2024, 12, 1)
+    assert months[-1] == date(2026, 11, 1)
+
+
+def test_available_months_empty_without_selector() -> None:
+    assert parse_available_months(fixture("alarms.html"), LOCALE_CS) == ()
+
+
 def test_monthly_index_returns_readings() -> None:
     readings = parse_monthly_index(fixture("index_mois.html"), "1234567", LOCALE_CS)
     assert readings[-1].value_m3 == pytest.approx(1120.0)
     assert readings[-1].timestamp.year == 2026
-
-
-def test_daily_index_aligned_with_timestamp() -> None:
-    readings = parse_daily_index(fixture("index_jour.html"), "1234567", LOCALE_CS)
-    last = readings[-1]
-    assert last.value_m3 == pytest.approx(1120.0)
-    assert last.timestamp.hour == 23
 
 
 def test_alarms_table_parsed_in_order() -> None:

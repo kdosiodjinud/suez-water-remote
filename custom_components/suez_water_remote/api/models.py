@@ -104,7 +104,6 @@ class MeterSnapshot:
     yearly_consumption: tuple[ConsumptionPoint, ...] = field(default_factory=tuple)
     daily_consumption: tuple[ConsumptionPoint, ...] = field(default_factory=tuple)
     monthly_index: tuple[MeterReading, ...] = field(default_factory=tuple)
-    daily_index: tuple[MeterReading, ...] = field(default_factory=tuple)
     alarms: tuple[AlarmEntry, ...] = field(default_factory=tuple)
     alarm_configs: tuple[AlarmConfig, ...] = field(default_factory=tuple)
 
@@ -120,7 +119,6 @@ class MeterSnapshot:
             "yearly_consumption_points": len(self.yearly_consumption),
             "daily_consumption_points": len(self.daily_consumption),
             "monthly_index_points": len(self.monthly_index),
-            "daily_index_points": len(self.daily_index),
             "alarm_count": len(self.alarms),
             "alarm_config_count": len(self.alarm_configs),
         }

@@ -1,13 +1,18 @@
 """Long-term statistics import for the Suez Water Remote integration.
 
-The portal publishes per-day consumption with a delay, so a live
-``TOTAL_INCREASING`` sensor would attribute late data to the wrong day in the
-Energy dashboard. Instead we import statistics with an explicit timestamp for
-each day, taken from :attr:`MeterSnapshot.daily_index` (the cumulative meter
-reading per day). Home Assistant derives daily consumption as the difference
-between consecutive ``sum`` values, so each day lands on its real date no
-matter when it was fetched. Re-importing the same ``start`` is idempotent, so
-days that arrive late are simply backfilled on the next refresh.
+The portal publishes per-day consumption with a delay (usually a day, at times
+more) and revises a partially measured day later, so a live
+``TOTAL_INCREASING`` sensor would attribute usage to the wrong day in the
+Energy dashboard. Instead we import an external statistic with one row per
+day, dated at 23:00 local time of the day it covers, whose ``sum`` is the
+running total of the daily consumption table. That table is the only portal
+dataset with liter precision; the daily meter-index table is rounded to whole
+cubic meters.
+
+Every import recomputes the rows of the days it covers, continuing from the
+last sum already stored before that window, so late or revised days land on
+their real date and the running total stays continuous with older history.
+Re-importing the same ``start`` is an idempotent upsert.
 
 The statistic is *external* (its id carries a ``:``), which lets the user add
 it to the Water section of the Energy dashboard without it being tied to a
@@ -16,18 +21,31 @@ live entity.
 
 from __future__ import annotations
 
+import asyncio
+import logging
 from collections.abc import Iterable
+from datetime import date, datetime, time, timedelta
 
+from homeassistant.components.recorder import get_instance
 from homeassistant.components.recorder.models import StatisticData, StatisticMetaData
-from homeassistant.components.recorder.statistics import async_add_external_statistics
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.components.recorder.statistics import (
+    async_add_external_statistics,
+    statistics_during_period,
+)
+from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 
-from .api import MeterReading
+from .api import ConsumptionPoint
 from .const import DOMAIN, MANUFACTURER
+
+_LOGGER = logging.getLogger(__name__)
 
 # m³ is one of the volume units the Energy dashboard accepts for water.
 _STATISTIC_UNIT = "m³"
+# How far back to look for the last stored sum when continuing a series. Rows
+# are daily, so this bounds the query to a few hundred rows.
+_CONTINUITY_LOOKBACK = timedelta(days=400)
+_CLEAR_TIMEOUT = 60.0
 
 
 def statistic_id(meter_id: str) -> str:
@@ -35,35 +53,59 @@ def statistic_id(meter_id: str) -> str:
     return f"{DOMAIN}:water_{meter_id}"
 
 
-def build_statistics(readings: Iterable[MeterReading]) -> list[StatisticData]:
-    """Build cumulative daily statistics from per-day meter readings.
+def day_start(day: date) -> datetime:
+    """Return the timestamp a day's consumption is recorded at: 23:00 local.
 
-    Each point uses the day's reading timestamp (already 23:00 local, i.e.
-    hour-aligned) made timezone-aware, and the cumulative meter value as both
-    ``sum`` and ``state``. Points are returned in ascending time order. Works
-    the same whether fed the recent polling window or the full history.
+    The Energy dashboard attributes a row to the hour it starts at, so the
+    last hour of the day keeps the whole day's usage on its real date.
     """
+    return datetime.combine(day, time(23), tzinfo=dt_util.get_default_time_zone())
+
+
+def build_statistics(
+    points: Iterable[ConsumptionPoint], base_sum: float, now: datetime
+) -> list[StatisticData]:
+    """Turn daily consumption into cumulative rows continuing from ``base_sum``.
+
+    Points are deduplicated by day (the last one wins) and sorted. A day that
+    is not over yet at ``now`` is left out: the portal publishes it partially
+    measured and the next refresh brings the complete value.
+    """
+    by_day = {point.period_start: point.value_m3 for point in points}
     stats: list[StatisticData] = []
-    for reading in sorted(readings, key=lambda r: r.timestamp):
-        start = dt_util.as_local(reading.timestamp).replace(
-            minute=0, second=0, microsecond=0
-        )
-        stats.append(
-            StatisticData(
-                start=start,
-                sum=reading.value_m3,
-                state=reading.value_m3,
-            )
-        )
+    running = base_sum
+    for day in sorted(by_day):
+        start = day_start(day)
+        if start > now:
+            break
+        running = round(running + by_day[day], 3)
+        stats.append(StatisticData(start=start, state=running, sum=running))
     return stats
 
 
-@callback
-def async_import_meter_statistics(
-    hass: HomeAssistant, meter_id: str, readings: Iterable[MeterReading]
+def _last_sum_before(hass: HomeAssistant, stat_id: str, start: datetime) -> float:
+    """Return the sum stored right before ``start`` (0.0 if none). Recorder thread."""
+    rows = statistics_during_period(
+        hass, start - _CONTINUITY_LOOKBACK, start, {stat_id}, "hour", None, {"sum"}
+    ).get(stat_id)
+    if not rows:
+        return 0.0
+    return rows[-1]["sum"] or 0.0
+
+
+async def async_import_meter_statistics(
+    hass: HomeAssistant, meter_id: str, points: Iterable[ConsumptionPoint]
 ) -> None:
-    """Import cumulative daily water statistics for one meter."""
-    stats = build_statistics(readings)
+    """Import daily water consumption of one meter as cumulative statistics."""
+    points = tuple(points)
+    if not points:
+        return
+    stat_id = statistic_id(meter_id)
+    first_day = min(point.period_start for point in points)
+    base_sum = await get_instance(hass).async_add_executor_job(
+        _last_sum_before, hass, stat_id, day_start(first_day)
+    )
+    stats = build_statistics(points, base_sum, dt_util.now())
     if not stats:
         return
     metadata = StatisticMetaData(
@@ -71,7 +113,22 @@ def async_import_meter_statistics(
         has_sum=True,
         name=f"{MANUFACTURER} water {meter_id}",
         source=DOMAIN,
-        statistic_id=statistic_id(meter_id),
+        statistic_id=stat_id,
         unit_of_measurement=_STATISTIC_UNIT,
     )
     async_add_external_statistics(hass, metadata, stats)
+
+
+async def async_clear_meter_statistics(
+    hass: HomeAssistant, meter_ids: Iterable[str]
+) -> None:
+    """Delete the statistics of ``meter_ids`` and wait until the recorder did."""
+    done = asyncio.Event()
+    get_instance(hass).async_clear_statistics(
+        [statistic_id(meter_id) for meter_id in meter_ids],
+        on_done=lambda: hass.loop.call_soon_threadsafe(done.set),
+    )
+    try:
+        await asyncio.wait_for(done.wait(), _CLEAR_TIMEOUT)
+    except TimeoutError:
+        _LOGGER.warning("timed out waiting for the recorder to clear water statistics")

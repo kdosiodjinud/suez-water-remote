@@ -174,17 +174,38 @@ def _stub_homeassistant() -> None:
          ButtonEntityDescription=_ButtonEntityDescription)
     make("homeassistant.components.diagnostics",
          async_redact_data=lambda d, _: d)
-    make("homeassistant.components.recorder")
+    class _RecorderInstance:
+        """Stand-in for ``Recorder``: runs executor jobs inline, clears at once."""
+
+        def __init__(self) -> None:
+            self.cleared: list[list[str]] = []
+
+        async def async_add_executor_job(self, fn, *args):
+            return fn(*args)
+
+        def async_clear_statistics(self, statistic_ids, *, on_done=None, **_):
+            self.cleared.append(list(statistic_ids))
+            if on_done is not None:
+                on_done()
+
+    recorder_instance = _RecorderInstance()
+    make("homeassistant.components.recorder",
+         get_instance=lambda hass: recorder_instance)
     # StatisticData / StatisticMetaData are TypedDicts in HA, i.e. plain dicts
     # at runtime — ``dict(**kwargs)`` mirrors their construction. The names MUST
     # match the real HA API exactly, otherwise the stub masks a bad import.
     make("homeassistant.components.recorder.models",
          StatisticData=dict, StatisticMetaData=dict)
     make("homeassistant.components.recorder.statistics",
-         async_add_external_statistics=Mock())
+         async_add_external_statistics=Mock(),
+         statistics_during_period=Mock(return_value={}))
     make("homeassistant.util")
+    from datetime import UTC, datetime
+
     make("homeassistant.util.dt",
-         as_utc=lambda d: d, as_local=lambda d: d)
+         as_utc=lambda d: d, as_local=lambda d: d,
+         now=lambda: datetime.now(UTC),
+         get_default_time_zone=lambda: UTC)
 
 
 _stub_homeassistant()

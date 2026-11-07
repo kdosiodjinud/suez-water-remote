@@ -58,7 +58,7 @@ STEP_USER_SCHEMA = vol.Schema(
 class SuezWaterConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Two-step flow: URL+credentials → meter selection."""
 
-    VERSION = 1
+    VERSION = 2
 
     def __init__(self) -> None:
         self._collected: dict[str, Any] = {}

@@ -19,7 +19,7 @@ import calendar
 import json
 import re
 from collections.abc import Iterable
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 from bs4 import BeautifulSoup, Tag
 
@@ -293,19 +293,39 @@ def _table_rows(table: Tag) -> list[list[str]]:
 
 _DATA_TABLE_ID = "ctl00_PHZonePrincipale_ctl01_TableTableau"
 
+# Unit stated in the value column header, e.g. ``Celková spotřeba (v l)`` or
+# ``Total consumption (in m³)``. The portal switches a table between liters
+# and cubic meters depending on how large the values it holds are.
+_HEADER_UNIT_RE = re.compile(r"\(\s*\w*\s*(?P<unit>l|m\xb3|m3)\s*\)", re.IGNORECASE)
+
+
+def _unit_divisor(header: str) -> float:
+    """Return what the column's values must be divided by to get m³."""
+    match = _HEADER_UNIT_RE.search(header)
+    if match is not None and match.group("unit").lower() == "l":
+        return 1000.0
+    return 1.0
+
+
+def _consumption_rows(html: str) -> tuple[list[list[str]], float]:
+    """Return the data rows of the consumption table and its m³ divisor."""
+    soup = BeautifulSoup(html, "html.parser")
+    rows = _table_rows(_data_table(soup, container_id=_DATA_TABLE_ID))
+    header = rows[0][1] if rows and len(rows[0]) > 1 else ""
+    return rows[1:], _unit_divisor(header)
+
 
 def parse_monthly_consumption(
     html: str, locale: Locale = DEFAULT_LOCALE
 ) -> tuple[ConsumptionPoint, ...]:
     """Parse the monthly consumption table."""
-    soup = BeautifulSoup(html, "html.parser")
-    table = _data_table(soup, container_id=_DATA_TABLE_ID)
+    rows, divisor = _consumption_rows(html)
     points: list[ConsumptionPoint] = []
-    for row in _table_rows(table)[1:]:
+    for row in rows:
         if len(row) < 2:
             continue
         month_start = parse_localized_month(row[0], locale)
-        value = parse_decimal(row[1], locale)
+        value = parse_decimal(row[1], locale) / divisor
         points.append(
             ConsumptionPoint(
                 period_start=month_start,
@@ -321,15 +341,14 @@ def parse_monthly_consumption(
 def parse_daily_consumption(
     html: str, locale: Locale = DEFAULT_LOCALE
 ) -> tuple[ConsumptionPoint, ...]:
-    """Parse the daily consumption table."""
-    soup = BeautifulSoup(html, "html.parser")
-    table = _data_table(soup, container_id=_DATA_TABLE_ID)
+    """Parse the daily consumption table (one month per page)."""
+    rows, divisor = _consumption_rows(html)
     points: list[ConsumptionPoint] = []
-    for row in _table_rows(table)[1:]:
+    for row in rows:
         if len(row) < 2:
             continue
         day = parse_localized_date(row[0], locale)
-        value = parse_decimal(row[1], locale)
+        value = parse_decimal(row[1], locale) / divisor
         points.append(
             ConsumptionPoint(period_start=day, period_end=day, value_m3=value)
         )
@@ -342,17 +361,16 @@ def parse_yearly_consumption(
     html: str, locale: Locale = DEFAULT_LOCALE
 ) -> tuple[ConsumptionPoint, ...]:
     """Parse the yearly consumption table."""
-    soup = BeautifulSoup(html, "html.parser")
-    table = _data_table(soup, container_id=_DATA_TABLE_ID)
+    rows, divisor = _consumption_rows(html)
     points: list[ConsumptionPoint] = []
-    for row in _table_rows(table)[1:]:
+    for row in rows:
         if len(row) < 2:
             continue
         try:
             year = int(row[0].strip())
         except ValueError:
             continue
-        value = parse_decimal(row[1], locale)
+        value = parse_decimal(row[1], locale) / divisor
         points.append(
             ConsumptionPoint(
                 period_start=date(year, 1, 1),
@@ -391,29 +409,32 @@ def parse_monthly_index(
     return tuple(readings)
 
 
-def parse_daily_index(
-    html: str, meter_id: str, locale: Locale = DEFAULT_LOCALE
-) -> tuple[MeterReading, ...]:
-    """Parse the daily meter-readings table."""
+_MONTH_SELECT_NAME_RE = re.compile(r"DropDownListSelectionMois$")
+
+
+def parse_available_months(
+    html: str, locale: Locale = DEFAULT_LOCALE
+) -> tuple[date, ...]:
+    """Return the first day of every month the page's month selector offers.
+
+    The daily tables show one month per page; the ``NavigationPeriode``
+    dropdown lists which months the portal can serve (a rolling window of
+    about two years). Option values are localized dates such as
+    ``01.12.2024`` or ``12/1/2024``; unparseable ones are skipped. Empty when
+    the page has no selector.
+    """
     soup = BeautifulSoup(html, "html.parser")
-    table = _data_table(soup, container_id=_DATA_TABLE_ID)
-    readings: list[MeterReading] = []
-    for row in _table_rows(table)[1:]:
-        if len(row) < 2:
+    select = soup.find("select", attrs={"name": _MONTH_SELECT_NAME_RE})
+    if select is None:
+        return ()
+    months: set[date] = set()
+    for option in select.find_all("option"):
+        try:
+            day = parse_localized_date(attr_str(option.get("value")), locale)
+        except SuezParseError:
             continue
-        day = parse_localized_date(row[0], locale)
-        value = parse_decimal(row[1], locale)
-        readings.append(
-            MeterReading(
-                meter_id=meter_id,
-                timestamp=datetime.combine(day, datetime.min.time())
-                + timedelta(hours=23),
-                value_m3=value,
-            )
-        )
-    if not readings:
-        raise SuezParseError("daily index table is empty")
-    return tuple(readings)
+        months.add(day.replace(day=1))
+    return tuple(sorted(months))
 
 
 # --- Alarms ------------------------------------------------------------------

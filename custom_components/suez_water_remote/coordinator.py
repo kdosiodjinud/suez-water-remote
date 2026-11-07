@@ -16,9 +16,11 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
 )
+from homeassistant.util import dt as dt_util
 
 from .api import (
     LOCALES,
+    ConsumptionPoint,
     MeterSnapshot,
     SuezAuthenticationError,
     SuezConnectionError,
@@ -84,9 +86,12 @@ class SuezWaterCoordinator(DataUpdateCoordinator[SuezData]):
 
     async def _async_update_data(self) -> SuezData:
         results: dict[str, MeterSnapshot] = {}
+        today = dt_util.now().date()
         try:
             for meter_id in self._meter_ids:
-                results[meter_id] = await self._client.async_fetch_snapshot(meter_id)
+                results[meter_id] = await self._client.async_fetch_snapshot(
+                    meter_id, today=today
+                )
         except SuezAuthenticationError as err:
             raise ConfigEntryAuthFailed(str(err)) from err
         except SuezConnectionError as err:
@@ -95,29 +100,30 @@ class SuezWaterCoordinator(DataUpdateCoordinator[SuezData]):
             raise UpdateFailed(f"portal error: {err}") from err
         # Import long-term statistics with the real per-day timestamps so the
         # Energy dashboard attributes consumption to the correct day even when
-        # the portal publishes it late. This covers the recent polling window;
-        # deeper history is handled by ``async_backfill``.
+        # the portal publishes it late. The snapshot covers the current and the
+        # previous month; deeper history is handled by ``async_backfill``.
         for snapshot in results.values():
-            async_import_meter_statistics(
-                self.hass, snapshot.meter_id, snapshot.daily_index
+            await async_import_meter_statistics(
+                self.hass, snapshot.meter_id, snapshot.daily_consumption
             )
         return SuezData(meters=results)
 
     async def async_backfill_meter(self, meter_id: str) -> None:
         """Import the full daily history for one meter into statistics.
 
-        Fetches the portal's complete daily series (not just the recent
-        window) and imports it; safe to run repeatedly (idempotent upsert).
-        Errors are logged and swallowed so a backfill never breaks the entry.
+        Walks every month the portal offers (a rolling window of about two
+        years) and imports the lot; safe to run repeatedly (idempotent
+        upsert). Errors are logged and swallowed so a backfill never breaks
+        the entry.
         """
+        points: list[ConsumptionPoint] = []
         try:
-            readings = await self._client.async_fetch_daily_index(
-                meter_id, complete=True
-            )
+            for month in await self._client.async_fetch_available_months():
+                points.extend(await self._client.async_fetch_daily_consumption(month))
         except SuezError as err:
             _LOGGER.warning("statistics backfill failed for %s: %s", meter_id, err)
             return
-        async_import_meter_statistics(self.hass, meter_id, readings)
+        await async_import_meter_statistics(self.hass, meter_id, points)
 
     async def async_backfill(self) -> None:
         """Backfill the full daily history for every configured meter."""

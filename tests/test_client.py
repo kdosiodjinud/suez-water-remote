@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from datetime import date
 
 import aiohttp
 import pytest
@@ -13,11 +14,13 @@ from custom_components.suez_water_remote.api import (
     LOCALE_CS,
     LOCALE_EN,
     LOCALE_FR,
+    ConsumptionPoint,
     SuezAuthenticationError,
     SuezConnectionError,
     SuezVhsClient,
     derive_base_url,
 )
+from custom_components.suez_water_remote.api.client import merge_daily, recent_months
 
 # Synthetic base URL used by the test suite. The same client must work for
 # any sub-domain/branch — see ``test_client_works_with_alternate_base_url``.
@@ -49,29 +52,38 @@ def _set_cookie_failure() -> list[str]:
     ]
 
 
+TODAY = date(2026, 5, 24)
+
+
 def _register_data_pages(m: aioresponses, base: str = BASE) -> None:
-    """Register every URL that ``async_fetch_snapshot`` calls in order."""
-    energy_pages = {
+    """Register every URL that ``async_fetch_snapshot`` calls for ``TODAY``."""
+    for affichage, fname in {
         "ConsoMois": "conso_mois.html",
         "ConsoAn": "conso_an.html",
-        "ConsoJour": "conso_jour.html",
-    }
-    for affichage, fname in energy_pages.items():
+    }.items():
         m.get(
             f"{base}Site_Energie.aspx?Affichage={affichage}",
             status=200,
             body=fixture(fname),
         )
-    for affichage, fname in {
-        "IndexMois": "index_mois.html",
-        "IndexJour": "index_jour.html",
-    }.items():
-        m.get(
-            f"{base}Site_Energie.aspx?Affichage={affichage}"
-            f"&IndexesSepares=true&PeriodeComplete=false",
-            status=200,
-            body=fixture(fname),
-        )
+    m.get(
+        f"{base}Site_Energie.aspx?Affichage=IndexMois"
+        f"&IndexesSepares=true&PeriodeComplete=false",
+        status=200,
+        body=fixture("index_mois.html"),
+    )
+    # Daily consumption: the current month plus the previous one, which the
+    # portal here has no table for (treated as "nothing published").
+    m.get(
+        f"{base}Site_Energie.aspx?Affichage=ConsoJour&Annee=2026&Mois=5",
+        status=200,
+        body=fixture("conso_jour.html"),
+    )
+    m.get(
+        f"{base}Site_Energie.aspx?Affichage=ConsoJour&Annee=2026&Mois=4",
+        status=200,
+        body="<html><body>no data for this month</body></html>",
+    )
     m.get(f"{base}Site_AlarmesClient.aspx", status=200, body=fixture("alarms.html"))
     m.get(
         f"{base}Site_ConfigurationAlarmeClient.aspx",
@@ -130,16 +142,20 @@ def test_derive_base_url_rejects_bad_input(bad_url: str) -> None:
         derive_base_url(bad_url)
 
 
-async def test_index_url_complete_flag_toggles_periode_complete() -> None:
+async def test_daily_url_selects_year_and_month() -> None:
     client = SuezVhsClient("user", "pass", BASE)
     try:
-        assert client._index_url("IndexJour").query["PeriodeComplete"] == "false"
-        assert (
-            client._index_url("IndexJour", complete=True).query["PeriodeComplete"]
-            == "true"
-        )
+        query = client._daily_url(date(2026, 10, 1)).query
+        assert query["Affichage"] == "ConsoJour"
+        assert query["Annee"] == "2026"
+        assert query["Mois"] == "10"
     finally:
         await client.close()
+
+
+def test_recent_months_spans_month_and_year_boundary() -> None:
+    assert recent_months(date(2026, 11, 7)) == (date(2026, 10, 1), date(2026, 11, 1))
+    assert recent_months(date(2026, 1, 3)) == (date(2025, 12, 1), date(2026, 1, 1))
 
 
 # --- Login & cookie handling -------------------------------------------------
@@ -184,11 +200,69 @@ async def test_login_autodetects_locale_from_login_page() -> None:
 async def test_login_failure_when_cookie_absent() -> None:
     """The portal returns to the login form silently; we must detect it."""
     with aioresponses() as m:
-        m.get(HOME_URL, status=200, body=fixture("login.html"))
-        m.post(LOGIN_POST_RE, status=200, body=fixture("login.html"))
+        m.get(HOME_URL, status=200, body=fixture("login.html"), repeat=True)
+        m.post(LOGIN_POST_RE, status=200, body=fixture("login.html"), repeat=True)
         client = SuezVhsClient("user", "wrong-pass", BASE)
         with pytest.raises(SuezAuthenticationError):
             await client.async_login()
+        await client.close()
+
+
+async def test_login_retries_once_when_portal_only_switches_language() -> None:
+    """A POST whose language differs from the form's culture is taken by the
+    portal as a language switch: no auth cookie, bounce back to the form. The
+    second submission (now in the pinned culture) logs in."""
+    from multidict import CIMultiDict
+
+    from aioresponses.core import CallbackResult
+
+    posts = 0
+
+    def _login_callback(url, **kwargs):
+        nonlocal posts
+        posts += 1
+        headers = CIMultiDict()
+        if posts == 1:
+            headers.add("Location", f"{LOGIN_URL}?ReturnUrl=%2fSite.aspx")
+            cookies = _set_cookie_failure()
+        else:
+            headers.add("Location", f"{BASE}Site.aspx")
+            cookies = _set_cookie_success()
+        for cookie in cookies:
+            headers.add("Set-Cookie", cookie)
+        return CallbackResult(status=302, headers=headers)
+
+    with aioresponses() as m:
+        m.get(HOME_URL, status=200, body=fixture("login.html"), repeat=True)
+        m.post(LOGIN_POST_RE, callback=_login_callback, repeat=True)
+        client = SuezVhsClient("user", "pass", BASE, locale=LOCALE_EN)
+        await client.async_login()
+        assert posts == 2
+        assert client._has_auth_cookie() is True
+        await client.close()
+
+
+async def test_login_pins_culture_cookie_for_chosen_locale() -> None:
+    """The pinned locale is sent as the ``Culture`` cookie before the form is
+    fetched, so the portal renders and processes it in that language."""
+    from multidict import CIMultiDict
+
+    from aioresponses.core import CallbackResult
+
+    def _login_callback(url, **kwargs):
+        headers = CIMultiDict()
+        headers.add("Location", f"{BASE}Site.aspx")
+        for cookie in (DELETE_COOKIE, SET_COOKIE):
+            headers.add("Set-Cookie", cookie)
+        return CallbackResult(status=302, headers=headers)
+
+    with aioresponses() as m:
+        m.get(HOME_URL, status=200, body=fixture("login.html"))
+        m.post(LOGIN_POST_RE, callback=_login_callback)
+        client = SuezVhsClient("user", "pass", BASE, locale=LOCALE_EN)
+        await client.async_login()
+        cookies = client._session.cookie_jar.filter_cookies(client.base_url)
+        assert cookies["Culture"].value == "en"
         await client.close()
 
 
@@ -223,7 +297,7 @@ async def test_fetch_snapshot_after_manual_cookie_injection() -> None:
     with aioresponses() as m:
         m.get(HOME_URL, status=200, body=fixture("home.html"))
         _register_data_pages(m)
-        snap = await client.async_fetch_snapshot()
+        snap = await client.async_fetch_snapshot(today=TODAY)
     await client.close()
 
     assert snap.meter_id == "1234567"
@@ -233,8 +307,8 @@ async def test_fetch_snapshot_after_manual_cookie_injection() -> None:
     assert len(snap.monthly_consumption) == 24
     assert len(snap.yearly_consumption) == 11
     assert len(snap.daily_consumption) == 24
+    assert snap.daily_consumption[0].period_start == date(2026, 5, 1)
     assert len(snap.monthly_index) == 19
-    assert len(snap.daily_index) == 24
     assert len(snap.alarms) == 7
     # The alarm-config endpoint is parsed alongside the alarm history;
     # both portals we test against expose two configured rows.
@@ -348,7 +422,7 @@ async def test_fetch_snapshot_recovers_from_stale_session() -> None:
         # Final GET after fresh auth succeeds with the real home page.
         m.get(HOME_URL, status=200, body=fixture("home.html"))
         _register_data_pages(m)
-        snap = await client.async_fetch_snapshot()
+        snap = await client.async_fetch_snapshot(today=TODAY)
     await client.close()
 
     assert snap.meter_id == "1234567"
@@ -362,14 +436,73 @@ async def test_fetch_snapshot_raises_auth_error_when_relogin_also_redirects() ->
     client._logged_in = True
 
     with aioresponses() as m:
-        # Three GETs to Site.aspx: initial (stale), re-login GET, post-relogin GET.
-        m.get(HOME_URL, status=200, body=fixture("login.html"))
-        m.get(HOME_URL, status=200, body=fixture("login.html"))
-        # Re-login POST silently fails (login form returned, no auth cookie).
-        m.post(LOGIN_POST_RE, status=200, body=fixture("login.html"))
+        # Every GET to Site.aspx lands on the login form (stale session, then
+        # the re-login attempts); every re-login POST silently fails too.
+        m.get(HOME_URL, status=200, body=fixture("login.html"), repeat=True)
+        m.post(LOGIN_POST_RE, status=200, body=fixture("login.html"), repeat=True)
         with pytest.raises(SuezAuthenticationError):
-            await client.async_fetch_snapshot()
+            await client.async_fetch_snapshot(today=TODAY)
     await client.close()
+
+
+async def test_fetch_daily_consumption_for_month_and_missing_table() -> None:
+    client = SuezVhsClient("user", "pass", BASE, locale=LOCALE_CS)
+    client._ingest_set_cookie(_set_cookie_success())
+    client._logged_in = True
+
+    with aioresponses() as m:
+        m.get(
+            f"{BASE}Site_Energie.aspx?Affichage=ConsoJour&Annee=2026&Mois=10",
+            status=200,
+            body=fixture("conso_jour_liters.html"),
+        )
+        m.get(
+            f"{BASE}Site_Energie.aspx?Affichage=ConsoJour&Annee=2026&Mois=9",
+            status=200,
+            body="<html><body>no data for this month</body></html>",
+        )
+        points = await client.async_fetch_daily_consumption(date(2026, 10, 1))
+        missing = await client.async_fetch_daily_consumption(date(2026, 9, 1))
+    await client.close()
+
+    assert len(points) == 31
+    assert points[0].value_m3 == pytest.approx(0.451)
+    assert missing == ()
+
+
+async def test_fetch_available_months_reads_month_selector() -> None:
+    client = SuezVhsClient("user", "pass", BASE, locale=LOCALE_CS)
+    client._ingest_set_cookie(_set_cookie_success())
+    client._logged_in = True
+
+    with aioresponses() as m:
+        m.get(
+            f"{BASE}Site_Energie.aspx?Affichage=ConsoJour",
+            status=200,
+            body=fixture("conso_jour_liters.html"),
+        )
+        months = await client.async_fetch_available_months()
+    await client.close()
+
+    assert len(months) == 24
+    assert months[0] == date(2024, 12, 1)
+    assert months[-1] == date(2026, 11, 1)
+
+
+def test_merge_daily_later_batch_wins_and_sorts() -> None:
+    def _point(day: date, value: float) -> ConsumptionPoint:
+        return ConsumptionPoint(period_start=day, period_end=day, value_m3=value)
+
+    merged = merge_daily(
+        (
+            (_point(date(2026, 11, 2), 0.264), _point(date(2026, 11, 1), 0.126)),
+            (_point(date(2026, 11, 1), 0.586),),
+        )
+    )
+    assert [(p.period_start, p.value_m3) for p in merged] == [
+        (date(2026, 11, 1), 0.586),
+        (date(2026, 11, 2), 0.264),
+    ]
 
 
 async def test_from_url_factory_pinned_locale_overrides_autodetect() -> None:

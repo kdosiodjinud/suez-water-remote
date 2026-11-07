@@ -33,9 +33,13 @@ raw label exactly as the portal sends it.
 
 ### Energy dashboard (water)
 
-The portal publishes daily figures with a delay, so a live sensor would record
-them under the wrong day. To avoid this, the integration imports **long-term
-statistics** with each day's real timestamp, as an external statistic.
+The portal publishes daily figures with a delay (usually the next evening,
+sometimes days later) and revises a partially measured day once the meter
+reports the rest, so a live sensor would record usage under the wrong day. To
+avoid this, the integration imports **long-term statistics** with each day's
+real timestamp, as an external statistic built from the portal's daily
+consumption table — the only dataset with liter precision (the daily
+meter-reading table is rounded to whole m³).
 
 To add water to the Energy dashboard:
 
@@ -57,11 +61,18 @@ Notes:
 - `<meter id>` is your meter number (the part after the last dash in the device
   name / site label).
 
-**Historical backfill.** On setup the integration imports the portal's **full
-daily history** (not just the recent window), so older days show up in the
-Energy dashboard too. You can re-run it any time with the per-meter **Import
-history** button — handy after the portal revises past days. How far back it
-reaches depends on what the portal returns in its "complete period" mode.
+**History and late data.** On setup the integration imports every month the
+portal offers (a rolling window of about two years), and on every poll it
+re-reads the current and the previous month. A day published up to a month
+late, or revised after a partial measurement, therefore still lands on its
+real date, and the running total stays continuous with older history. You can
+re-run the full import any time with the per-meter **Import history** button.
+
+**Upgrading from 0.5.x.** Earlier versions built the statistic from the
+rounded meter-reading table, which made daily usage show up as steps of 0 or
+1000 l. The first start after the upgrade drops that statistic and re-imports
+the history with liter precision; the Energy dashboard keeps its configuration
+because the statistic id does not change.
 
 The integration **derives everything** (country sub-domain, branch path,
 UI locale) from a single URL you paste in. No country/branch hard-codes.
@@ -122,7 +133,11 @@ more. Until a given day is published:
   the `measured_date` / `data_available` attributes show whether the `0` is a
   real measurement or "not published yet".
 - The **Energy dashboard** statistic backfills each day onto its correct date as
-  soon as the portal makes it available.
+  soon as the portal makes it available, and a day first published with a
+  partial value is corrected on a later poll (the current and the previous
+  month are re-read every time).
+- The portal serves some months of the daily table in liters and others in
+  cubic meters; values are always converted to m³.
 
 The integration polls **every 6 hours** by default — enough to pick up new data
 within the next morning, while staying light on the portal. The **Refresh now**

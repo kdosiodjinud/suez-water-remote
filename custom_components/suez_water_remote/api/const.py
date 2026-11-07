@@ -28,7 +28,6 @@ CULTURE_COOKIE: Final = "Culture"
 AFFICHAGE_CONSO_DAY: Final = "ConsoJour"
 AFFICHAGE_CONSO_MONTH: Final = "ConsoMois"
 AFFICHAGE_CONSO_YEAR: Final = "ConsoAn"
-AFFICHAGE_INDEX_DAY: Final = "IndexJour"
 AFFICHAGE_INDEX_MONTH: Final = "IndexMois"
 
 USER_AGENT: Final = (
