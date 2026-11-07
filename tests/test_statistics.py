@@ -8,6 +8,7 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 from homeassistant.components.recorder import get_instance
+from homeassistant.components.recorder.models import StatisticMeanType
 from homeassistant.components.recorder.statistics import (
     async_add_external_statistics,
     statistics_during_period,
@@ -74,7 +75,8 @@ async def test_import_continues_from_last_stored_sum() -> None:
     assert metadata["statistic_id"] == STAT_ID
     assert metadata["unit_of_measurement"] == "m³"
     assert metadata["has_sum"] is True
-    assert metadata["has_mean"] is False
+    assert metadata["mean_type"] == StatisticMeanType.NONE
+    assert "has_mean" not in metadata  # deprecated, HA drops it in 2026.4
     assert metadata["source"] == "suez_water_remote"
     assert [s["sum"] for s in stats] == [42.5]
     # The lookup covers a bounded window right before the first imported day.

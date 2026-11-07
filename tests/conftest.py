@@ -194,8 +194,16 @@ def _stub_homeassistant() -> None:
     # StatisticData / StatisticMetaData are TypedDicts in HA, i.e. plain dicts
     # at runtime — ``dict(**kwargs)`` mirrors their construction. The names MUST
     # match the real HA API exactly, otherwise the stub masks a bad import.
+    from enum import IntEnum
+
+    class _StatisticMeanType(IntEnum):
+        NONE = 0
+        ARITHMETIC = 1
+        CIRCULAR = 2
+
     make("homeassistant.components.recorder.models",
-         StatisticData=dict, StatisticMetaData=dict)
+         StatisticData=dict, StatisticMeanType=_StatisticMeanType,
+         StatisticMetaData=dict)
     make("homeassistant.components.recorder.statistics",
          async_add_external_statistics=Mock(),
          statistics_during_period=Mock(return_value={}))

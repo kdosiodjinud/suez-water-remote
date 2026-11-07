@@ -27,7 +27,11 @@ from collections.abc import Iterable
 from datetime import date, datetime, time, timedelta
 
 from homeassistant.components.recorder import get_instance
-from homeassistant.components.recorder.models import StatisticData, StatisticMetaData
+from homeassistant.components.recorder.models import (
+    StatisticData,
+    StatisticMeanType,
+    StatisticMetaData,
+)
 from homeassistant.components.recorder.statistics import (
     async_add_external_statistics,
     statistics_during_period,
@@ -45,7 +49,9 @@ _STATISTIC_UNIT = "m³"
 # How far back to look for the last stored sum when continuing a series. Rows
 # are daily, so this bounds the query to a few hundred rows.
 _CONTINUITY_LOOKBACK = timedelta(days=400)
-_CLEAR_TIMEOUT = 60.0
+# The clear is queued behind whatever the recorder is busy with; right after a
+# restart that backlog can take minutes on a large database.
+_CLEAR_TIMEOUT = 300.0
 
 
 def statistic_id(meter_id: str) -> str:
@@ -109,7 +115,7 @@ async def async_import_meter_statistics(
     if not stats:
         return
     metadata = StatisticMetaData(
-        has_mean=False,
+        mean_type=StatisticMeanType.NONE,
         has_sum=True,
         name=f"{MANUFACTURER} water {meter_id}",
         source=DOMAIN,
